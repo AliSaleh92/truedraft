@@ -5,7 +5,7 @@
     </a>
 </div>
 
-<!-- Footer Content -->
+<!-- Footer Section -->
 <footer class="bg-black text-white py-16">
     <div class="container mx-auto px-6 text-center">
         <h2 class="text-3xl md:text-4xl font-bold mb-12 text-white" data-i18n="contact_header">تواصل معنا</h2>
@@ -235,9 +235,27 @@
             document.querySelectorAll('.lang-en').forEach(el => el.classList.remove('hidden'));
         }
     }
-    // Call on load and whenever language toggles
+    
+    // Call immediately and on language toggle
     updateLegalLang();
-    // Hook into global toggleLanguage if needed, or use MutationObserver on body lang
-    const observer = new MutationObserver(updateLegalLang);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+    
+    const originalToggle = window.toggleLanguage;
+    if (typeof window.toggleLanguage === 'function') {
+        window.toggleLanguage = function() {
+            originalToggle();
+            updateLegalLang();
+        }
+    } else {
+        // If toggleLanguage isn't defined yet (loading race condition), rely on interval or observer
+        const checkLang = setInterval(() => {
+            updateLegalLang();
+        }, 500);
+        setTimeout(() => clearInterval(checkLang), 5000);
+    }
 </script>
+
+# Updated files:
+
+## footer.html
+
+Update complete legal texts and language switching logic.
