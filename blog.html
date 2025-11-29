@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-XXXXXX');</script>
+    <!-- End Google Tag Manager -->
     <title>المدونة | True Draft</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -16,6 +23,10 @@
     <style>body { font-family: 'Cairo', sans-serif; } .animate-fade-in { animation: fadeIn 0.3s ease-in-out; } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }</style>
 </head>
 <body class="bg-white text-black antialiased flex flex-col min-h-screen">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
     <nav class="fixed top-0 w-full z-[999] bg-white/95 backdrop-blur-md border-b border-gray-100 py-4 shadow-sm transition-all duration-300">
         <div class="container mx-auto px-6 md:px-12 flex justify-between items-center">
@@ -59,7 +70,9 @@
     <main class="flex-grow pt-[100px] px-6 pb-20">
         <div class="container mx-auto max-w-6xl">
             <h1 class="text-4xl font-bold mb-12 border-b pb-6" data-i18n="blog_title">المدونة</h1>
-            <div id="blog-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-10"></div>
+            <div id="blog-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+                 <div id="loader" class="text-center col-span-3 text-gray-500 py-10">جاري تحميل المقالات...</div>
+            </div>
         </div>
     </main>
 
@@ -238,23 +251,32 @@
         </div>
     </div>
 
-    <!-- Blog Detail Modal (Specific to this page) -->
-    <div id="blog-detail-view" class="hidden fixed inset-0 z-[2050] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl overflow-y-auto relative">
-            <button onclick="closeBlogDetail()" class="sticky top-4 left-4 z-50 bg-white rounded-full p-2 shadow"><svg width="24" height="24" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
-            <div class="h-64 w-full relative"><img id="blog-img" src="" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div><div class="absolute bottom-6 right-6 text-white"><span id="blog-cat" class="bg-[#C69C6D] text-black px-2 py-1 text-xs font-bold mb-2 inline-block"></span><p id="blog-date" class="text-xs opacity-80"></p></div></div>
-            <div class="p-8 md:p-12"><h1 id="blog-title" class="text-3xl font-bold mb-6"></h1><div id="blog-content" class="prose prose-lg max-w-none text-gray-700 leading-loose"></div></div>
-        </div>
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgxIJYhMQB_2n_CbQ47uhnU8lBE2ji5J8",
+            authDomain: "truedraftcrm.firebaseapp.com",
+            projectId: "truedraftcrm",
+            storageBucket: "truedraftcrm.firebasestorage.app",
+            messagingSenderId: "920547055600",
+            appId: "1:920547055600:web:c74f7de68ca8ae35852f35"
+        };
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
+            window.db = db;
+            window.dbRef = ref;
+            window.dbOnValue = onValue;
+            document.dispatchEvent(new Event('firebaseReady'));
+        } catch (error) {
+            console.error("Firebase Init Error:", error);
+            document.getElementById('loader').innerText = 'خطأ في الاتصال.';
+        }
+    </script>
     <script>
-        // Page Specific Logic
-        const posts = [
-            { id: 1, title: 'دليل حساب تكلفة تشطيب فيلا 2025', category: 'مقاولات', date: '15 JAN 2025', image: 'images/blog1.jpg', content: '<p>تفاصيل المقال...</p>' },
-            { id: 2, title: 'الفرق بين المودرن والنيو كلاسيك', category: 'تصميم', date: '10 JAN 2025', image: 'images/blog2.jpg', content: '<p>تفاصيل المقال...</p>' },
-            { id: 3, title: 'أخطاء كارثية عند اختيار المقاول', category: 'نصائح', date: '05 JAN 2025', image: 'images/blog3.jpg', content: '<p>تفاصيل المقال...</p>' }
-        ];
-
         let currentLang = localStorage.getItem('lang') || 'ar';
         const translations = {
             ar: {
@@ -263,21 +285,9 @@
                 projects: 'مشاريعنا', 
                 blog: 'المدونة', 
                 blog_title: 'المدونة',
+                read_more: 'اقرأ المزيد',
                 contact: 'تواصل معنا', 
                 careers: 'التوظيف',
-                about_title: 'عن True Draft', 
-                about_text: 'تأسست True Draft على مبدأ أن كل مشروع مميز يبدأ من مسودة حقيقية… مسودة دقيقة، صادقة، وواضحة الاتجاه. نحن نصنع مشاريع تُبنى على رؤية أصلية لا تنحرف، وتفاصيل تُصاغ بعناية منذ اللحظة الأولى وحتى اكتمال التنفيذ.',
-                vision_title: 'رؤيتنا', 
-                vision_text: 'أن نكون مرجعاً في صناعة التصميم والبناء، حيث تبدأ المشاريع من أساس صحيح وتكتمل بمعايير عالية تعكس أصالة الفكرة الأولى.',
-                mission_title: 'رسالتنا', 
-                mission_text: 'تقديم رحلة تصميم وبناء شفافة ومدروسة، نحافظ فيها على روح المشروع منذ مخططه الأول وحتى تسليمه كمنجز متقن ورفيع.',
-                goal_title: 'هدفنا', 
-                goal_text: 'صياغة حلول تصميم وبناء ترتكز على فكرة نقيّة وخطة محكمة، لتتحول إلى واقع يحمل نفس صدق وجودة المسودة الأولى.',
-                contact_header: 'تواصل معنا', 
-                email_label: 'البريد الإلكتروني', 
-                phone_label: 'اتصل بنا', 
-                location_label: 'الموقع', 
-                location_val: 'الرياض، المملكة العربية السعودية', 
                 rights: 'جميع الحقوق محفوظة لشركة True Draft © 2025',
                 privacy: 'سياسة الخصوصية', 
                 terms: 'الشروط والأحكام',
@@ -291,59 +301,6 @@
                 form_send: 'إرسال', 
                 form_send_app: 'إرسال الطلب', 
                 select_position: 'اختر التخصص...',
-                privacy_intro: 'مقدمة:',
-                privacy_text_1: 'في شركة ترو درفت (True Draft)، ندرك أن مشاريع البناء والتصاميم هي أمور شخصية وهامة جداً لعملائنا. نحن نلتزم بحماية خصوصيتك وبياناتك الشخصية والهندسية، وتوضح هذه السياسة كيفية جمعنا واستخدامنا لهذه المعلومات.',
-                privacy_h1: '1. المعلومات التي نجمعها',
-                privacy_text_2: 'عند استخدامك لموقعنا أو طلب خدمة، قد نطلب منك المعلومات التالية:',
-                privacy_li_1: 'بيانات الهوية: الاسم الكامل.',
-                privacy_li_2: 'بيانات الاتصال: رقم الهاتف، البريد الإلكتروني، والعنوان.',
-                privacy_li_3: 'بيانات المشروع: موقع الأرض، المساحة، صور الموقع، المخططات الهندسية السابقة، صور الصكوك أو التراخيص (لغرض الدراسة والتسعير).',
-                privacy_h2: '2. كيف نستخدم معلوماتك؟',
-                privacy_text_3: 'نستخدم البيانات التي نجمعها للأغراض التالية فقط:',
-                privacy_li_4: 'دراسة طلبك وتقديم عروض أسعار دقيقة ومخصصة لمشروعك.',
-                privacy_li_5: 'التواصل معك لتحديد مواعيد المعاينة أو مناقشة التصاميم.',
-                privacy_li_6: 'إتمام إجراءات التعاقد واستخراج التراخيص (إذا كانت ضمن نطاق العمل).',
-                privacy_li_7: 'تحسين خدماتنا وتجربة المستخدم على الموقع.',
-                privacy_h3: '3. مشاركة البيانات',
-                privacy_text_4: 'نحن لا نقوم ببيع أو تأجير بياناتك الشخصية لأي طرف ثالث. ومع ذلك، قد نشارك بعض البيانات الضرورية في الحالات التالية فقط:',
-                privacy_li_8: 'شركاء التنفيذ: مثل الموردين أو المقاولين من الباطن لغرض حساب الكميات أو التوريد لمشروعك الخاص.',
-                privacy_li_9: 'الجهات الحكومية: في حال طُلب منا ذلك بموجب القانون أو لاستخراج تراخيص البناء الخاصة بك.',
-                privacy_h4: '4. أمن البيانات',
-                privacy_text_5: 'نتخذ كافة التدابير الأمنية التقنية والإدارية المناسبة لحماية بياناتك ومخططات منزلك من الوصول غير المصرح به، أو التغيير، أو الإفصاح.',
-                privacy_h5: '5. حقوقك',
-                privacy_text_6: 'يحق لك في أي وقت:',
-                privacy_li_10: 'الاستفسار عن البيانات التي نحتفظ بها عنك.',
-                privacy_li_11: 'طلب تصحيح أي معلومات خاطئة.',
-                privacy_li_12: 'طلب حذف بياناتك من سجلاتنا (بشرط ألا يتعارض ذلك مع التزاماتنا القانونية أو التعاقدية القائمة).',
-                privacy_h6: '6. ملفات تعريف الارتباط (Cookies)',
-                privacy_text_7: 'قد يستخدم موقعنا ملفات تعريف الارتباط لتحسين تجربتك وتذكر تفضيلاتك. يمكنك تعطيلها من إعدادات المتصفح الخاص بك، ولكن قد يؤثر ذلك على عمل بعض أجزاء الموقع.',
-                privacy_h7: '7. اتصل بنا',
-                privacy_text_8: 'إذا كان لديك أي استفسار حول سياسة الخصوصية، يسعدنا تواصلك معنا عبر: البريد الإلكتروني: info@truedraft.com.sa - الهاتف: 0582226234',
-                terms_intro: 'مقدمة:',
-                terms_text_1: 'أهلاً بكم في موقع شركة ترو درفت (True Draft) للمقاولات العامة. يرجى قراءة هذه الشروط والأحكام بعناية قبل استخدام الموقع أو طلب أي من خدماتنا. بمجرد استخدامك لهذا الموقع، فإنك تقر بموافقتك الكاملة على هذه الشروط. إذا كنت لا توافق على أي جزء منها، يرجى التوقف عن استخدام الموقع فوراً.',
-                terms_h1: '1. التعريفات',
-                terms_li_1: '"الشركة" أو "نحن": يقصد بها شركة ترو درفت (True Draft) للمقاولات العامة.',
-                terms_li_2: '"العميل" أو "أنت": يقصد به أي فرد أو جهة اعتبارية تقوم بزيارة الموقع أو طلب خدماتنا.',
-                terms_li_3: '"الخدمات": تشمل التصميم المعماري والداخلي، التنفيذ، الإشراف، وأي خدمات هندسية أو استشارية أخرى نعرضها.',
-                terms_h2: '2. طبيعة الخدمات والتعاقد',
-                terms_li_4: 'إن المعلومات والصور المعروضة على هذا الموقع هي لغرض التعريف بخدماتنا وعرض سابقة أعمالنا.',
-                terms_li_5: 'طلب "عرض سعر" عبر الموقع لا يعتبر عقداً ملزماً للشركة بالبدء في التنفيذ.',
-                terms_li_6: 'يخضع البدء الفعلي لأي مشروع (تصميم أو مقاولات) لتوقيع عقد رسمي منفصل ومكتوب يحدد التزامات الطرفين، الدفعات، الجدول الزمني، والمواصفات الفنية، وهو المرجع القانوني الوحيد بين الطرفين.',
-                terms_h3: '3. حقوق الملكية الفكرية',
-                terms_li_7: 'جميع المحتويات الموجودة على هذا الموقع (بما في ذلك النصوص، التصاميم الهندسية، المخططات، الشعارات، صور المشاريع المنفذة، والرسومات ثلاثية الأبعاد) هي ملكية حصرية لشركة "ترو درفت" ومحمية بموجب أنظمة الملكية الفكرية في المملكة العربية السعودية.',
-                terms_li_8: 'يمنع منعاً باتاً نسخ، إعادة إنتاج، أو استخدام أي من تصاميمنا لأغراض تجارية أو شخصية دون إذن كتابي صريح من إدارة الشركة.',
-                terms_h4: '4. الأسعار والدفعات',
-                terms_li_9: 'الأسعار التقديرية (إن وجدت على الموقع) قابلة للتغيير بناءً على أسعار مواد البناء في السوق ومواصفات المشروع الدقيقة.',
-                terms_li_10: 'يلتزم العميل بدفع المستحقات المالية وفقاً للدفعات المتفق عليها في العقد الرسمي المبرم لاحقاً.',
-                terms_h5: '5. مسؤولية العميل',
-                terms_li_11: 'أنت مسؤول عن صحة البيانات والمعلومات التي تقدمها لنا (مثل مساحة الأرض، الصكوك، التراخيص الحكومية).',
-                terms_li_12: 'تخلي الشركة مسؤوليتها عن أي تأخير أو غرامات ناتجة عن عدم صحة أوراق العميل أو عدم استخراجه للتراخيص اللازمة ما لم ينص العقد على تولينا هذه المهمة.',
-                terms_h6: '6. إخلاء المسؤولية',
-                terms_text_2: 'نسعى جاهدين لضمان دقة المعلومات على موقعنا، لكننا لا نقدم أي ضمانات بأن الموقع سيكون خالياً من الأخطاء المطبعية أو التقنية. استخدامك للموقع يكون على مسؤوليتك الخاصة.',
-                terms_h7: '7. القانون الواجب التطبيق',
-                terms_text_3: 'تخضع هذه الشروط والأحكام للأنظمة واللوائح المعمول بها في المملكة العربية السعودية. في حال نشوء أي نزاع، يتم اللجوء إلى الجهات القضائية المختصة في مدينة الرياض.',
-                terms_h8: '8. التعديلات',
-                terms_text_4: 'تحتفظ "ترو درفت" بالحق في تعديل هذه الشروط في أي وقت. يعتبر استمرارك في استخدام الموقع بعد التعديلات موافقة ضمنية عليها.'
             },
             en: {
                 home: 'Home', 
@@ -351,21 +308,9 @@
                 projects: 'Projects', 
                 blog: 'Blog', 
                 blog_title: 'The Blog',
+                read_more: 'Read More',
                 contact: 'Contact', 
                 careers: 'Careers',
-                about_title: 'About True Draft', 
-                about_text: 'True Draft was founded on the principle that every distinctive project begins with a true draft... a precise, honest, and clear-direction draft. We craft projects built on an original vision that does not deviate, with details meticulously shaped from the very first moment until completion.',
-                vision_title: 'Vision', 
-                vision_text: 'To be a benchmark in the design and build industry, where projects start from a correct foundation and complete with high standards reflecting the originality of the initial idea.',
-                mission_title: 'Mission', 
-                mission_text: 'To deliver a transparent and thoughtful design and build journey, preserving the project\'s spirit from its first blueprint to its delivery as a refined accomplishment.',
-                goal_title: 'Goal', 
-                goal_text: 'To formulate design and build solutions grounded in a pure idea and a solid plan, transforming into reality carrying the same honesty and quality of the first draft.',
-                contact_header: 'Get in Touch', 
-                email_label: 'Email', 
-                phone_label: 'Call Us', 
-                location_label: 'Location', 
-                location_val: 'Riyadh, Saudi Arabia', 
                 rights: 'All rights reserved True Draft © 2025',
                 privacy: 'Privacy Policy', 
                 terms: 'Terms & Conditions',
@@ -379,59 +324,6 @@
                 form_send: 'Send', 
                 form_send_app: 'Submit Application', 
                 select_position: 'Select Position...',
-                privacy_intro: 'Introduction:',
-                privacy_text_1: 'At True Draft, we understand that construction projects and home designs are highly personal and significant to our clients. We are committed to protecting your privacy and your personal and engineering data. This policy outlines how we collect, use, and protect this information.',
-                privacy_h1: '1. Information We Collect',
-                privacy_text_2: 'When you use our website or request a service, we may collect the following information:',
-                privacy_li_1: 'Identity Data: Full name.',
-                privacy_li_2: 'Contact Data: Phone number, email address, and location.',
-                privacy_li_3: 'Project Data: Land location, area size, site photos, previous engineering plans, and copies of title deeds or permits (for study and pricing purposes).',
-                privacy_h2: '2. How We Use Your Information?',
-                privacy_text_3: 'We use the data we collect solely for the following purposes:',
-                privacy_li_4: 'Analyzing your request to provide accurate, customized quotes for your project.',
-                privacy_li_5: 'Contacting you to schedule site visits or discuss designs.',
-                privacy_li_6: 'Completing contracting procedures and obtaining permits (if within the scope of work).',
-                privacy_li_7: 'Improving our services and user experience on the website.',
-                privacy_h3: '3. Data Sharing',
-                privacy_text_4: 'We do not sell or rent your personal data to any third parties. However, we may share necessary data in the following cases only:',
-                privacy_li_8: 'Execution Partners: Such as suppliers or subcontractors, strictly for the purpose of quantity surveying or material supply for your specific project.',
-                privacy_li_9: 'Government Authorities: If required by law or to process your building permits.',
-                privacy_h4: '4. Data Security',
-                privacy_text_5: 'We implement appropriate technical and administrative security measures to protect your data and home blueprints from unauthorized access, alteration, or disclosure.',
-                privacy_h5: '5. Your Rights',
-                privacy_text_6: 'You have the right at any time to:',
-                privacy_li_10: 'Inquire about the data we hold about you.',
-                privacy_li_11: 'Request correction of any incorrect information.',
-                privacy_li_12: 'Request the deletion of your data from our records (provided it does not conflict with our ongoing legal or contractual obligations).',
-                privacy_h6: '6. Cookies',
-                privacy_text_7: 'Our website may use cookies to enhance your experience and remember your preferences. You can disable cookies through your browser settings, though this may affect the functionality of some parts of the site.',
-                privacy_h7: '7. Contact Us',
-                privacy_text_8: 'If you have any questions regarding this Privacy Policy, please contact us via: Email: info@truedraft.com.sa - Phone: 0582226234',
-                terms_intro: 'Introduction:',
-                terms_text_1: 'Welcome to the True Draft General Contracting website. Please read these Terms and Conditions carefully before using our website or requesting any of our services. By accessing or using this website, you agree to be bound by these terms. If you do not agree with any part of these terms, please discontinue use immediately.',
-                terms_h1: '1. Definitions',
-                terms_li_1: '"Company", "We", or "Us": Refers to True Draft General Contracting.',
-                terms_li_2: '"Client" or "You": Refers to any individual or entity visiting the website or requesting our services.',
-                terms_li_3: '"Services": Includes architectural and interior design, construction execution, engineering supervision, and any other consulting services we offer.',
-                terms_h2: '2. Scope of Services and Contracting',
-                terms_li_4: 'The information and images displayed on this website are for the purpose of showcasing our portfolio and services.',
-                terms_li_5: 'Requesting a "Quote" via the website does not constitute a binding contract to commence work.',
-                terms_li_6: 'The actual commencement of any project (design or construction) is subject to a separate, written official contract signed by both parties. This contract outlines obligations, payments, timeline, and technical specifications, and serves as the sole legal reference.',
-                terms_h3: '3. Intellectual Property',
-                terms_li_7: 'All content on this website (including text, engineering designs, blueprints, logos, 3D renders, and photos of executed projects) is the exclusive property of True Draft and is protected by Intellectual Property laws in the Kingdom of Saudi Arabia.',
-                terms_li_8: 'It is strictly prohibited to copy, reproduce, or use any of our designs for commercial or personal purposes without express written permission from the Company management.',
-                terms_h4: '4. Pricing and Payments',
-                terms_li_9: 'Estimated prices (if shown on the website) are subject to change based on market material costs and specific project requirements.',
-                terms_li_10: 'The Client is obligated to settle financial dues according to the payment schedule agreed upon in the formal written contract.',
-                terms_h5: '5. Client Responsibilities',
-                terms_li_11: 'You are responsible for the accuracy of the data and information you provide to us (e.g., land area, title deeds, government permits).',
-                terms_li_12: 'The Company disclaims responsibility for any delays or fines resulting from incorrect documentation provided by the Client or failure to obtain necessary permits, unless the contract explicitly states that we are responsible for such tasks.',
-                terms_h6: '6. Disclaimer',
-                terms_text_2: 'We strive to ensure the accuracy of the information on our website; however, we do not guarantee that the site is free from typographical or technical errors. Your use of the website is at your own risk.',
-                terms_h7: '7. Governing Law',
-                terms_text_3: 'These Terms and Conditions are governed by the laws and regulations of the Kingdom of Saudi Arabia. In the event of any dispute, the competent courts in the city of Riyadh shall have jurisdiction.',
-                terms_h8: '8. Amendments',
-                terms_text_4: 'True Draft reserves the right to amend these terms at any time. Your continued use of the website after any changes constitutes your acceptance of the new terms.'
             }
         };
 
@@ -451,7 +343,7 @@
             if(btnText) btnText.textContent = currentLang === 'ar' ? 'EN' : 'عربي';
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if(translations[currentLang][key]) el.textContent = translations[currentLang][key];
+                if(translations[currentLang] && translations[currentLang][key]) el.textContent = translations[currentLang][key];
             });
         }
 
@@ -459,34 +351,52 @@
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('lang', currentLang);
             applyLanguage();
+            // We need to re-render posts if language changes, which will be handled by fetching again or storing both languages.
+            // For simplicity, we'll just let the fetch function re-run on language change.
+            fetchAndRenderPosts();
         }
 
-        function render() {
-            const grid = document.getElementById('blog-grid');
-            grid.innerHTML = posts.map(p => `
-                <article class="cursor-pointer group" onclick="openBlog(${p.id})">
-                    <div class="h-64 bg-gray-200 overflow-hidden relative rounded-md mb-4"><img src="${p.image}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105"><div class="absolute top-4 right-4 bg-white px-3 py-1 text-xs font-bold shadow-sm">${p.date}</div></div>
-                    <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">${p.category}</span>
-                    <h3 class="text-2xl font-bold mt-2 mb-2 group-hover:underline">${p.title}</h3>
-                    <span class="text-xs font-bold border-b border-black">اقرأ المزيد</span>
-                </article>
-            `).join('');
-        }
+        function fetchAndRenderPosts() {
+            const postsRef = window.dbRef(window.db, 'blogPosts');
+            window.dbOnValue(postsRef, (snapshot) => {
+                const posts = snapshot.val();
+                const grid = document.getElementById('blog-grid');
+                const loader = document.getElementById('loader');
+                if(loader) loader.remove();
 
-        function openBlog(id) {
-            const p = posts.find(x => x.id === id); if(!p) return;
-            document.getElementById('blog-title').textContent = p.title;
-            document.getElementById('blog-cat').textContent = p.category;
-            document.getElementById('blog-date').textContent = p.date;
-            document.getElementById('blog-img').src = p.image;
-            document.getElementById('blog-content').innerHTML = p.content;
-            document.getElementById('blog-detail-view').classList.remove('hidden');
+                if (!posts) {
+                    grid.innerHTML = '<p class="col-span-3 text-center">لا توجد مقالات حالياً.</p>';
+                    return;
+                }
+                
+                const postsArray = Object.keys(posts).map(key => ({ id: key, ...posts[key] })).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+                grid.innerHTML = postsArray.map(p => {
+                    const title = currentLang === 'ar' ? p.title_ar : p.title_en;
+                    const category = currentLang === 'ar' ? p.category_ar : p.category_en;
+                    const date = new Date(p.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+                    
+                    return `
+                        <a href="blog-post.html?slug=${p.slug}" class="group">
+                            <article>
+                                <div class="aspect-[4/3] bg-gray-200 overflow-hidden relative rounded-lg shadow-md mb-4">
+                                    <img src="${p.imageUrl}" alt="${title}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
+                                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold shadow-sm rounded-md font-english">${date}</div>
+                                </div>
+                                <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">${category}</span>
+                                <h3 class="text-2xl font-bold mt-2 mb-2 group-hover:text-[#C69C6D] transition-colors">${title}</h3>
+                                <span class="text-sm font-bold border-b-2 border-black pb-1 group-hover:border-[#C69C6D] transition-colors" data-i18n="read_more">اقرأ المزيد</span>
+                            </article>
+                        </a>
+                    `
+                }).join('');
+                applyLanguage(); // To translate "Read More"
+            }, { onlyOnce: true });
         }
-        function closeBlogDetail() { document.getElementById('blog-detail-view').classList.add('hidden'); }
 
         document.addEventListener('DOMContentLoaded', () => {
             applyLanguage();
-            render();
+            document.addEventListener('firebaseReady', fetchAndRenderPosts);
         });
     </script>
 </body>
