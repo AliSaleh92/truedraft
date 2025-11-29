@@ -36,48 +36,55 @@
     </div>
 </footer>
 
-<div id="privacy-modal" class="hidden fixed inset-0 z-[5000] bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in">
+<div id="privacy-modal" class="hidden fixed inset-0 z-[5000] bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in" dir="rtl">
     <div class="min-h-screen flex items-center justify-center p-6">
         <div class="w-full max-w-3xl bg-white border border-gray-200 shadow-2xl relative p-10 md:p-16 rounded-xl h-[80vh] overflow-y-auto">
-            <button onclick="closeModal('privacy-modal')" class="absolute top-6 left-6 rtl:left-6 rtl:right-auto p-2 border rounded-full hover:bg-black hover:text-white transition-colors ltr:left-auto ltr:right-6 sticky z-50 bg-white">
+            <button onclick="closeModal('privacy-modal')" class="absolute top-6 left-6 p-2 border rounded-full hover:bg-black hover:text-white transition-colors sticky z-50 bg-white">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <h2 class="text-3xl font-bold mb-8 sticky top-0 bg-white pb-4" data-i18n="privacy">سياسة الخصوصية</h2>
-            <div class="prose max-w-none text-sm leading-relaxed text-gray-600 space-y-6">
+            <h2 class="text-3xl font-bold mb-8 sticky top-0 bg-white pb-4 text-right" data-i18n="privacy">سياسة الخصوصية</h2>
+            <div class="prose max-w-none text-sm leading-relaxed text-gray-800 space-y-6 text-right">
                 <p class="font-bold" data-i18n="privacy_intro">مقدمة:</p>
                 <p data-i18n="privacy_text_1">في شركة ترو درفت (True Draft)، ندرك أن مشاريع البناء والتصاميم هي أمور شخصية وهامة جداً لعملائنا. نحن نلتزم بحماية خصوصيتك وبياناتك الشخصية والهندسية، وتوضح هذه السياسة كيفية جمعنا واستخدامنا لهذه المعلومات.</p>
+                
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h1">1. المعلومات التي نجمعها</h3>
                 <p data-i18n="privacy_text_2">عند استخدامك لموقعنا أو طلب خدمة، قد نطلب منك المعلومات التالية:</p>
-                <ul class="list-disc list-inside">
+                <ul class="list-disc list-outside mr-6 space-y-2">
                     <li data-i18n="privacy_li_1">بيانات الهوية: الاسم الكامل.</li>
                     <li data-i18n="privacy_li_2">بيانات الاتصال: رقم الهاتف، البريد الإلكتروني، والعنوان.</li>
                     <li data-i18n="privacy_li_3">بيانات المشروع: موقع الأرض، المساحة، صور الموقع، المخططات الهندسية السابقة، صور الصكوك أو التراخيص (لغرض الدراسة والتسعير).</li>
                 </ul>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h2">2. كيف نستخدم معلوماتك؟</h3>
                 <p data-i18n="privacy_text_3">نستخدم البيانات التي نجمعها للأغراض التالية فقط:</p>
-                <ul class="list-disc list-inside">
+                <ul class="list-disc list-outside mr-6 space-y-2">
                     <li data-i18n="privacy_li_4">دراسة طلبك وتقديم عروض أسعار دقيقة ومخصصة لمشروعك.</li>
                     <li data-i18n="privacy_li_5">التواصل معك لتحديد مواعيد المعاينة أو مناقشة التصاميم.</li>
                     <li data-i18n="privacy_li_6">إتمام إجراءات التعاقد واستخراج التراخيص (إذا كانت ضمن نطاق العمل).</li>
                     <li data-i18n="privacy_li_7">تحسين خدماتنا وتجربة المستخدم على الموقع.</li>
                 </ul>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h3">3. مشاركة البيانات</h3>
                 <p data-i18n="privacy_text_4">نحن لا نقوم ببيع أو تأجير بياناتك الشخصية لأي طرف ثالث. ومع ذلك، قد نشارك بعض البيانات الضرورية في الحالات التالية فقط:</p>
-                <ul class="list-disc list-inside">
+                <ul class="list-disc list-outside mr-6 space-y-2">
                     <li data-i18n="privacy_li_8">شركاء التنفيذ: مثل الموردين أو المقاولين من الباطن لغرض حساب الكميات أو التوريد لمشروعك الخاص.</li>
                     <li data-i18n="privacy_li_9">الجهات الحكومية: في حال طُلب منا ذلك بموجب القانون أو لاستخراج تراخيص البناء الخاصة بك.</li>
                 </ul>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h4">4. أمن البيانات</h3>
                 <p data-i18n="privacy_text_5">نتخذ كافة التدابير الأمنية التقنية والإدارية المناسبة لحماية بياناتك ومخططات منزلك من الوصول غير المصرح به، أو التغيير، أو الإفصاح.</p>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h5">5. حقوقك</h3>
                 <p data-i18n="privacy_text_6">يحق لك في أي وقت:</p>
-                <ul class="list-disc list-inside">
+                <ul class="list-disc list-outside mr-6 space-y-2">
                     <li data-i18n="privacy_li_10">الاستفسار عن البيانات التي نحتفظ بها عنك.</li>
                     <li data-i18n="privacy_li_11">طلب تصحيح أي معلومات خاطئة.</li>
                     <li data-i18n="privacy_li_12">طلب حذف بياناتك من سجلاتنا (بشرط ألا يتعارض ذلك مع التزاماتنا القانونية أو التعاقدية القائمة).</li>
                 </ul>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h6">6. ملفات تعريف الارتباط (Cookies)</h3>
                 <p data-i18n="privacy_text_7">قد يستخدم موقعنا ملفات تعريف الارتباط لتحسين تجربتك وتذكر تفضيلاتك. يمكنك تعطيلها من إعدادات المتصفح الخاص بك، ولكن قد يؤثر ذلك على عمل بعض أجزاء الموقع.</p>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h7">7. اتصل بنا</h3>
                 <p data-i18n="privacy_text_8">إذا كان لديك أي استفسار حول سياسة الخصوصية، يسعدنا تواصلك معنا عبر:</p>
                 <p>info@truedraft.com.sa</p>
@@ -87,47 +94,55 @@
     </div>
 </div>
 
-<div id="terms-modal" class="hidden fixed inset-0 z-[5000] bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in">
+<div id="terms-modal" class="hidden fixed inset-0 z-[5000] bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in" dir="rtl">
     <div class="min-h-screen flex items-center justify-center p-6">
         <div class="w-full max-w-3xl bg-white border border-gray-200 shadow-2xl relative p-10 md:p-16 rounded-xl h-[80vh] overflow-y-auto">
-            <button onclick="closeModal('terms-modal')" class="absolute top-6 left-6 rtl:left-6 rtl:right-auto p-2 border rounded-full hover:bg-black hover:text-white transition-colors ltr:left-auto ltr:right-6 sticky z-50 bg-white">
+            <button onclick="closeModal('terms-modal')" class="absolute top-6 left-6 p-2 border rounded-full hover:bg-black hover:text-white transition-colors sticky z-50 bg-white">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <h2 class="text-3xl font-bold mb-8 sticky top-0 bg-white pb-4" data-i18n="terms">الشروط والأحكام</h2>
-            <div class="prose max-w-none text-sm leading-relaxed text-gray-600 space-y-6">
+            <h2 class="text-3xl font-bold mb-8 sticky top-0 bg-white pb-4 text-right" data-i18n="terms">الشروط والأحكام</h2>
+            <div class="prose max-w-none text-sm leading-relaxed text-gray-800 space-y-6 text-right">
                 <p class="font-bold" data-i18n="terms_intro">مقدمة:</p>
                 <p data-i18n="terms_text_1">أهلاً بكم في موقع شركة ترو درفت (True Draft) للمقاولات العامة. يرجى قراءة هذه الشروط والأحكام بعناية قبل استخدام الموقع أو طلب أي من خدماتنا. بمجرد استخدامك لهذا الموقع، فإنك تقر بموافقتك الكاملة على هذه الشروط. إذا كنت لا توافق على أي جزء منها، يرجى التوقف عن استخدام الموقع فوراً.</p>
+                
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h1">1. التعريفات</h3>
-                <ul class="list-disc list-inside">
+                <ul class="list-disc list-outside mr-6 space-y-2">
                     <li data-i18n="terms_li_1">"الشركة" أو "نحن": يقصد بها شركة ترو درفت (True Draft) للمقاولات العامة.</li>
                     <li data-i18n="terms_li_2">"العميل" أو "أنت": يقصد به أي فرد أو جهة اعتبارية تقوم بزيارة الموقع أو طلب خدماتنا.</li>
                     <li data-i18n="terms_li_3">"الخدمات": تشمل التصميم المعماري والداخلي، التنفيذ، الإشراف، وأي خدمات هندسية أو استشارية أخرى نعرضها.</li>
                 </ul>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h2">2. طبيعة الخدمات والتعاقد</h3>
-                <ul class="list-disc list-inside">
+                <ul class="list-disc list-outside mr-6 space-y-2">
                     <li data-i18n="terms_li_4">إن المعلومات والصور المعروضة على هذا الموقع هي لغرض التعريف بخدماتنا وعرض سابقة أعمالنا.</li>
                     <li data-i18n="terms_li_5">طلب "عرض سعر" عبر الموقع لا يعتبر عقداً ملزماً للشركة بالبدء في التنفيذ.</li>
                     <li data-i18n="terms_li_6">يخضع البدء الفعلي لأي مشروع (تصميم أو مقاولات) لتوقيع عقد رسمي منفصل ومكتوب يحدد التزامات الطرفين، الدفعات، الجدول الزمني، والمواصفات الفنية، وهو المرجع القانوني الوحيد بين الطرفين.</li>
                 </ul>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h3">3. حقوق الملكية الفكرية</h3>
-                <ul class="list-disc list-inside">
+                <ul class="list-disc list-outside mr-6 space-y-2">
                     <li data-i18n="terms_li_7">جميع المحتويات الموجودة على هذا الموقع (بما في ذلك النصوص، التصاميم الهندسية، المخططات، الشعارات، صور المشاريع المنفذة، والرسومات ثلاثية الأبعاد) هي ملكية حصرية لشركة "ترو درفت" ومحمية بموجب أنظمة الملكية الفكرية في المملكة العربية السعودية.</li>
                     <li data-i18n="terms_li_8">يمنع منعاً باتاً نسخ، إعادة إنتاج، أو استخدام أي من تصاميمنا لأغراض تجارية أو شخصية دون إذن كتابي صريح من إدارة الشركة.</li>
                 </ul>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h4">4. الأسعار والدفعات</h3>
-                <ul class="list-disc list-inside">
+                <ul class="list-disc list-outside mr-6 space-y-2">
                     <li data-i18n="terms_li_9">الأسعار التقديرية (إن وجدت على الموقع) قابلة للتغيير بناءً على أسعار مواد البناء في السوق ومواصفات المشروع الدقيقة.</li>
                     <li data-i18n="terms_li_10">يلتزم العميل بدفع المستحقات المالية وفقاً للدفعات المتفق عليها في العقد الرسمي المبرم لاحقاً.</li>
                 </ul>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h5">5. مسؤولية العميل</h3>
-                <ul class="list-disc list-inside">
+                <ul class="list-disc list-outside mr-6 space-y-2">
                     <li data-i18n="terms_li_11">أنت مسؤول عن صحة البيانات والمعلومات التي تقدمها لنا (مثل مساحة الأرض، الصكوك، التراخيص الحكومية).</li>
                     <li data-i18n="terms_li_12">تخلي الشركة مسؤوليتها عن أي تأخير أو غرامات ناتجة عن عدم صحة أوراق العميل أو عدم استخراجه للتراخيص اللازمة ما لم ينص العقد على تولينا هذه المهمة.</li>
                 </ul>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h6">6. إخلاء المسؤولية</h3>
                 <p data-i18n="terms_text_2">نسعى جاهدين لضمان دقة المعلومات على موقعنا، لكننا لا نقدم أي ضمانات بأن الموقع سيكون خالياً من الأخطاء المطبعية أو التقنية. استخدامك للموقع يكون على مسؤوليتك الخاصة.</p>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h7">7. القانون الواجب التطبيق</h3>
                 <p data-i18n="terms_text_3">تخضع هذه الشروط والأحكام للأنظمة واللوائح المعمول بها في المملكة العربية السعودية. في حال نشوء أي نزاع، يتم اللجوء إلى الجهات القضائية المختصة في مدينة الرياض.</p>
+
                 <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h8">8. التعديلات</h3>
                 <p data-i18n="terms_text_4">تحتفظ "ترو درفت" بالحق في تعديل هذه الشروط في أي وقت. يعتبر استمرارك في استخدام الموقع بعد التعديلات موافقة ضمنية عليها.</p>
             </div>
