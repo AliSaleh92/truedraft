@@ -20,7 +20,7 @@
 </head>
 <body class="bg-white text-black antialiased flex flex-col min-h-screen">
 
-    <!-- Header Placeholder -->
+    <!-- Header Container -->
     <div id="header-placeholder"></div>
 
     <main class="flex-grow pt-[80px]">
@@ -48,7 +48,7 @@
         </section>
     </main>
 
-    <!-- Footer Placeholder -->
+    <!-- Footer Container -->
     <div id="footer-placeholder"></div>
 
     <script>
@@ -112,13 +112,13 @@
         function nextSlide() { const s=document.querySelectorAll('.slide'); if(s.length){ s[currentSlide].classList.remove('active'); currentSlide=(currentSlide+1)%s.length; s[currentSlide].classList.add('active'); }}
         function prevSlide() { const s=document.querySelectorAll('.slide'); if(s.length){ s[currentSlide].classList.remove('active'); currentSlide=(currentSlide-1+s.length)%s.length; s[currentSlide].classList.add('active'); }}
 
-        // Shared Globals for onClick from loaded HTML
+        // Shared Global Functions (Needs to be global for onclick from loaded HTML)
         window.openModal = (id) => { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
         window.closeModal = (id) => { document.getElementById(id).classList.add('hidden'); document.body.style.overflow = 'auto'; };
         window.toggleMenu = () => { const m=document.getElementById('mobile-menu'); m.classList.toggle('hidden'); m.classList.toggle('flex'); };
         window.submitCareerForm = (e) => { e.preventDefault(); const n=document.getElementById('career-name').value; window.location.href=`mailto:hr@truedraft.com.sa?subject=Job Application: ${n}`; };
         window.submitContactForm = (e) => { e.preventDefault(); const n=document.getElementById('contact-name').value; window.location.href=`mailto:info@truedraft.com.sa?subject=Contact: ${n}`; };
-        window.toggleLanguage = toggleLanguage;
+        window.toggleLanguage = toggleLanguage; // Expose to global scope
 
         document.addEventListener('DOMContentLoaded', () => { loadSharedComponents(); initSlider(); });
     </script>
