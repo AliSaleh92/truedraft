@@ -198,21 +198,21 @@
             </div>
         </div>
     </div>
-    <div id="project-detail-view" class="hidden fixed inset-0 z-[2050] bg-black/90 backdrop-blur-md animate-fade-in">
-        <div class="w-full h-full bg-white flex flex-col md:flex-row shadow-2xl overflow-hidden md:max-w-6xl md:max-h-[90vh] md:rounded-xl">
+    <div id="project-detail-view" class="hidden fixed inset-0 z-[2050] bg-black/90 backdrop-blur-md animate-fade-in md:flex md:items-center md:justify-center md:p-4">
+        <div class="w-full h-full bg-white flex flex-col md:flex-row shadow-2xl overflow-hidden md:max-w-7xl md:h-auto md:max-h-[90vh] md:rounded-xl">
             <button onclick="closeProjectDetail()" class="absolute top-4 left-4 z-50 bg-white/90 rounded-full p-2 hover:scale-110 transition shadow-lg rtl:left-4 rtl:right-auto ltr:right-4 ltr:left-auto"><svg width="24" height="24" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
-            <div class="w-full md:w-[65%] h-1/2 md:h-full bg-black relative flex flex-col">
+            <div class="w-full md:w-[60%] h-1/2 md:h-auto md:aspect-[4/3] bg-black relative flex flex-col">
                 <div id="gallery-container" class="w-full flex-1 relative group">
                     <button onclick="prevGallery()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur text-white p-3 rounded-full hover:bg-white hover:text-black transition rtl:right-4 rtl:left-auto ltr:left-4 ltr:right-auto opacity-0 group-hover:opacity-100"><svg class="w-6 h-6 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
                     <button onclick="nextGallery()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur text-white p-3 rounded-full hover:bg-white hover:text-black transition rtl:left-4 rtl:right-auto ltr:right-4 ltr:left-auto opacity-0 group-hover:opacity-100"><svg class="w-6 h-6 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
                 </div>
                  <div id="gallery-thumbs" class="w-full h-24 bg-black/50 p-2 flex items-center justify-center gap-2"></div>
             </div>
-            <div class="w-full md:w-[35%] p-8 md:p-10 overflow-y-auto bg-white flex flex-col justify-center">
+            <div class="w-full md:w-[40%] p-8 md:p-12 overflow-y-auto bg-white flex flex-col justify-center">
                 <span id="detail-cat" class="text-xs font-bold text-[#C69C6D] uppercase tracking-widest mb-4 block"></span>
                 <h2 id="detail-title" class="text-3xl md:text-4xl font-bold mb-6 leading-tight"></h2>
                 <div id="detail-desc" class="text-gray-600 leading-loose text-sm font-light mb-8"></div>
-                <div id="detail-facts" class="border-t pt-6 mt-6 grid grid-cols-2 gap-x-4 gap-y-6"></div>
+                <div id="detail-facts" class="border-t pt-8 mt-8 grid grid-cols-2 gap-x-8 gap-y-8"></div>
             </div>
         </div>
     </div>
@@ -287,6 +287,9 @@
                 if(translations[currentLang] && translations[currentLang][key]) el.textContent = translations[currentLang][key];
             });
             renderProjects();
+            if (activeProject) {
+                renderProjectDetails(activeProject);
+            }
         }
 
         function toggleLanguage() {
@@ -311,25 +314,30 @@
                 </div>
             `).join('');
         }
+        
+        function renderProjectDetails(project) {
+            if (!project) return;
+            const currentTranslations = translations[currentLang] || translations.ar;
+            document.getElementById('detail-cat').textContent = currentTranslations[project.category_key];
+            document.getElementById('detail-title').textContent = currentTranslations[project.title_key];
+            document.getElementById('detail-desc').textContent = currentTranslations[project.desc_key];
+            
+            const factsContainer = document.getElementById('detail-facts');
+            const projectDetails = currentTranslations[project.details_key] || [];
+            factsContainer.innerHTML = projectDetails.map(fact => `
+                <div>
+                    <span class="block text-sm text-gray-500 font-bold">${fact.label}</span>
+                    <p class="font-bold text-black text-lg mt-2">${fact.value}</p>
+                </div>
+            `).join('');
+        }
 
         function openProject(id) {
             activeProject = projects.find(p => p.id === id);
             if (!activeProject) return;
             galleryIndex = 0;
 
-            const currentTranslations = translations[currentLang] || translations.ar;
-            document.getElementById('detail-cat').textContent = currentTranslations[activeProject.category_key];
-            document.getElementById('detail-title').textContent = currentTranslations[activeProject.title_key];
-            document.getElementById('detail-desc').textContent = currentTranslations[activeProject.desc_key];
-            
-            const factsContainer = document.getElementById('detail-facts');
-            const projectDetails = currentTranslations[activeProject.details_key] || [];
-            factsContainer.innerHTML = projectDetails.map(fact => `
-                <div>
-                    <span class="block text-xs text-gray-400 font-bold uppercase tracking-widest">${fact.label}</span>
-                    <p class="font-bold text-black mt-1">${fact.value}</p>
-                </div>
-            `).join('');
+            renderProjectDetails(activeProject);
 
             const thumbsContainer = document.getElementById('gallery-thumbs');
             thumbsContainer.innerHTML = activeProject.images.map((imgSrc, index) => `
@@ -351,8 +359,9 @@
             if (!activeProject) return;
             const container = document.getElementById('gallery-container');
             container.insertAdjacentHTML('afterbegin', `<img src="${activeProject.images[galleryIndex]}" class="w-full h-full object-cover animate-fade-in" alt="Gallery image ${galleryIndex + 1}">`);
-            if (container.children.length > 1) {
-                container.children[1].remove();
+            if (container.children.length > 2) { // Allow for button elements
+                const oldImg = Array.from(container.children).find(el => el.tagName === 'IMG');
+                 if(oldImg && oldImg !== container.firstChild) oldImg.remove();
             }
 
             const thumbs = document.querySelectorAll('#gallery-thumbs img');
