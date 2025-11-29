@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشاريعنا | True Draft</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { dark: '#050505' }, fontFamily: { sans: ['Cairo', 'sans-serif'], english: ['Manrope', 'sans-serif'] } }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;700;900&family=Manrope:wght@200;300;400;500;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Cairo', sans-serif; } .grayscale-img { filter: grayscale(100%); transition: filter 0.5s ease; } .group:hover .grayscale-img { filter: grayscale(0%); } .animate-fade-in { animation: fadeIn 0.3s ease-in-out; } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }</style>
+</head>
+<body class="bg-white text-black antialiased flex flex-col min-h-screen">
+
+    <div id="header-placeholder"></div>
+
+    <main class="flex-grow pt-[100px] px-6 pb-20">
+        <div class="container mx-auto">
+            <h1 class="text-4xl font-bold mb-12 border-b pb-6" data-i18n="projects_title">مشاريعنا</h1>
+            <div id="projects-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- Project Detail Modal -->
+    <div id="project-detail-view" class="hidden fixed inset-0 z-[2050] bg-black/90 backdrop-blur-md flex items-center justify-center p-0 md:p-8">
+        <div class="bg-white w-full max-w-6xl h-full md:h-[90vh] flex flex-col md:flex-row relative shadow-2xl overflow-hidden rounded-xl">
+            <button onclick="closeProjectDetail()" class="absolute top-4 left-4 z-50 bg-white/90 rounded-full p-2 hover:scale-110 transition shadow-lg rtl:left-4 rtl:right-auto ltr:right-4 ltr:left-auto"><svg width="24" height="24" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+            <div class="w-full md:w-[65%] h-1/2 md:h-full bg-black relative group">
+                <div id="gallery-container" class="w-full h-full"></div>
+                <button onclick="prevGallery()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur text-white p-3 rounded-full hover:bg-white hover:text-black transition rtl:right-4 rtl:left-auto ltr:left-4 ltr:right-auto"><svg class="w-6 h-6 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+                <button onclick="nextGallery()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur text-white p-3 rounded-full hover:bg-white hover:text-black transition rtl:left-4 rtl:right-auto ltr:right-4 ltr:left-auto"><svg class="w-6 h-6 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+            </div>
+            <div class="w-full md:w-[35%] p-10 overflow-y-auto bg-white flex flex-col justify-center">
+                <span id="detail-cat" class="text-xs font-bold text-[#C69C6D] uppercase tracking-widest mb-4 block"></span>
+                <h2 id="detail-title" class="text-4xl font-bold mb-6 leading-tight"></h2>
+                <div id="detail-desc" class="text-gray-600 leading-loose text-sm font-light mb-8"></div>
+                <div class="border-t pt-6"><p id="detail-loc" class="text-xs font-bold text-gray-400 uppercase tracking-widest"></p></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const projects = [
+            { 
+                id: 1, 
+                title: 'مشروع مسكه ليفلز', 
+                category: 'سكني / تجاري', 
+                location: 'الرياض', 
+                desc: 'مشروع مسكه ليفلز يتميز بتصميمه العصري الذي يدمج بين الفخامة والعملية، موفراً بيئة سكنية وتجارية متكاملة.', 
+                cover: 'images/project1-cover.jpg',
+                images: ['images/project1-1.jpg', 'images/project1-2.jpg', 'images/project1-3.jpg'] 
+            },
+            { 
+                id: 2, 
+                title: 'فيلا خاصة', 
+                category: 'سكني', 
+                location: 'الرياض', 
+                desc: 'فيلا خاصة صممت لتوفير أقصى درجات الراحة والخصوصية، مع اهتمام دقيق بالتفاصيل الداخلية والخارجية.', 
+                cover: 'images/project2-cover.jpg',
+                images: ['images/project2-1.jpg', 'images/project2-2.jpg', 'images/project2-3.jpg'] 
+            },
+            { 
+                id: 3, 
+                title: 'مقهى جيره', 
+                category: 'تجاري', 
+                location: 'الرياض', 
+                desc: 'مقهى جيره يقدم تجربة ضيافة فريدة في أجواء مستوحاة من التراث بلمسة حديثة.', 
+                cover: 'images/project3-cover.jpg',
+                images: ['images/project3-1.jpg', 'images/project3-2.jpg', 'images/project3-3.jpg'] 
+            }
+        ];
+
+        let currentLang = localStorage.getItem('lang') || 'ar';
+        let activeProject = null;
+        let galleryIndex = 0;
+
+        const translations = {
+            ar: { projects_title: 'مشاريعنا', home: 'الرئيسية', about: 'عن ترو درفت', projects: 'مشاريعنا', blog: 'المدونة', contact: 'تواصل معنا', careers: 'التوظيف', contact_header: 'تواصل معنا', email_label: 'البريد الإلكتروني', phone_label: 'اتصل بنا', location_label: 'الموقع', location_val: 'الرياض، المملكة العربية السعودية', rights: 'جميع الحقوق محفوظة لشركة True Draft © 2025', privacy: 'سياسة الخصوصية', terms: 'الشروط والأحكام', careers_title: 'انضم إلى فريقنا', careers_subtitle: 'املأ النموذج أدناه...', form_name: 'الاسم', form_phone: 'رقم الجوال', form_email: 'البريد الإلكتروني', form_position: 'المسمى الوظيفي', form_message: 'الرسالة', form_send: 'إرسال', form_send_app: 'إرسال الطلب', select_position: 'اختر التخصص...', privacy_intro: 'مقدمة:', privacy_text_1: '...', terms_intro: 'مقدمة:', terms_text_1: '...' },
+            en: { projects_title: 'Our Projects', home: 'Home', about: 'About Us', projects: 'Projects', blog: 'Blog', contact: 'Contact', careers: 'Careers', contact_header: 'Get in Touch', email_label: 'Email', phone_label: 'Call Us', location_label: 'Location', location_val: 'Riyadh, Saudi Arabia', rights: 'All rights reserved True Draft © 2025', privacy: 'Privacy Policy', terms: 'Terms & Conditions', careers_title: 'Join Our Team', careers_subtitle: 'Fill the form below...', form_name: 'Name', form_phone: 'Mobile', form_email: 'Email', form_position: 'Position', form_message: 'Message', form_send: 'Send', form_send_app: 'Submit Application', select_position: 'Select Position...', privacy_intro: 'Introduction:', privacy_text_1: '...', terms_intro: 'Introduction:', terms_text_1: '...' }
+        };
+
+        async function loadSharedComponents() {
+            try {
+                const headerRes = await fetch('header.html');
+                document.getElementById('header-placeholder').innerHTML = await headerRes.text();
+                const footerRes = await fetch('footer.html');
+                document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
+                applyLanguage();
+            } catch (e) { console.error(e); }
+        }
+
+        function applyLanguage() {
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.body.style.fontFamily = currentLang === 'ar' ? "'Cairo', sans-serif" : "'Manrope', sans-serif";
+            const btnText = document.getElementById('lang-btn-text');
+            if(btnText) btnText.textContent = currentLang === 'ar' ? 'EN' : 'عربي';
+            document.querySelectorAll('[data-i18n]').forEach(el => { const k=el.getAttribute('data-i18n'); if(translations[currentLang][k]) el.textContent=translations[currentLang][k]; });
+        }
+        function toggleLanguage() { currentLang = currentLang === 'ar' ? 'en' : 'ar'; localStorage.setItem('lang', currentLang); applyLanguage(); }
+
+        function render() {
+            const grid = document.getElementById('projects-grid');
+            grid.innerHTML = projects.map(p => `
+                <div class="group cursor-pointer" onclick="openDetail(${p.id})">
+                    <div class="bg-gray-200 aspect-[5/4] w-full relative overflow-hidden mb-4 rounded-lg">
+                        <img src="${p.cover}" class="w-full h-full object-cover grayscale-img transition duration-700 transform group-hover:scale-105">
+                        <div class="absolute top-4 right-4 bg-black/60 text-white px-3 py-1 text-xs backdrop-blur-md rounded-sm uppercase tracking-widest">${p.category}</div>
+                    </div>
+                    <h3 class="text-2xl font-bold group-hover:underline underline-offset-8 decoration-[#C69C6D] decoration-2 transition-all">${p.title}</h3>
+                    <p class="text-sm text-gray-500 mt-2 font-english uppercase tracking-widest">${p.location}</p>
+                </div>
+            `).join('');
+        }
+
+        function openDetail(id) {
+            activeProject = projects.find(x => x.id === id);
+            if(!activeProject) return;
+            galleryIndex = 0;
+            document.getElementById('detail-title').textContent = activeProject.title;
+            document.getElementById('detail-cat').textContent = activeProject.category;
+            document.getElementById('detail-desc').textContent = activeProject.desc;
+            document.getElementById('detail-loc').textContent = activeProject.location;
+            updateGallery();
+            document.getElementById('project-detail-view').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateGallery() {
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = `<img src="${activeProject.images[galleryIndex]}" class="w-full h-full object-cover animate-fade-in">`;
+        }
+        function nextGallery() { galleryIndex = (galleryIndex + 1) % activeProject.images.length; updateGallery(); }
+        function prevGallery() { galleryIndex = (galleryIndex - 1 + activeProject.images.length) % activeProject.images.length; updateGallery(); }
+        function closeProjectDetail() { document.getElementById('project-detail-view').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+
+        // Shared Globals
+        window.openModal = (id) => { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
+        window.closeModal = (id) => { document.getElementById(id).classList.add('hidden'); document.body.style.overflow = 'auto'; };
+        window.toggleMenu = () => { const m=document.getElementById('mobile-menu'); m.classList.toggle('hidden'); m.classList.toggle('flex'); };
+        window.submitCareerForm = (e) => { e.preventDefault(); const n=document.getElementById('career-name').value; window.location.href=`mailto:hr@truedraft.com.sa?subject=Job Application: ${n}`; };
+        window.submitContactForm = (e) => { e.preventDefault(); const n=document.getElementById('contact-name').value; window.location.href=`mailto:info@truedraft.com.sa?subject=Contact: ${n}`; };
+        window.toggleLanguage = toggleLanguage;
+
+        document.addEventListener('DOMContentLoaded', () => { loadSharedComponents(); render(); });
+    </script>
+</body>
+</html>
