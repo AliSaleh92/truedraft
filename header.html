@@ -21,21 +21,73 @@
         </button>
     </div>
 
-    <!-- Mobile Menu (Full Screen White Background) -->
+    <!-- Mobile Menu -->
     <div id="mobile-menu" class="fixed inset-0 bg-white z-[5000] hidden flex-col justify-center items-center gap-8 text-center animate-fade-in w-full h-screen overflow-hidden">
         <button onclick="toggleMenu()" class="absolute top-6 right-6 p-2 rounded-full border hover:bg-gray-100 rtl:right-auto rtl:left-6 ltr:left-auto ltr:right-6">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
-        
         <a href="index.html" onclick="toggleMenu()" class="text-2xl font-bold text-black hover:text-[#C69C6D] transition-colors" data-i18n="home">الرئيسية</a>
         <a href="index.html#about" onclick="toggleMenu()" class="text-2xl font-bold text-black hover:text-[#C69C6D] transition-colors" data-i18n="about">عن ترو درفت</a>
         <a href="projects.html" onclick="toggleMenu()" class="text-2xl font-bold text-black hover:text-[#C69C6D] transition-colors" data-i18n="projects">مشاريعنا</a>
         <a href="blog.html" onclick="toggleMenu()" class="text-2xl font-bold text-black hover:text-[#C69C6D] transition-colors" data-i18n="blog">المدونة</a>
         <button onclick="toggleMenu(); openModal('careers-modal')" class="text-2xl font-bold text-black hover:text-[#C69C6D] transition-colors" data-i18n="careers">التوظيف</button>
         <button onclick="toggleMenu(); openModal('contact-modal')" class="text-2xl font-bold text-black hover:text-[#C69C6D] transition-colors" data-i18n="contact">تواصل معنا</button>
-        
-        <button onclick="toggleMenu(); toggleLanguage()" class="text-xl font-english mt-8 font-bold border-2 border-black text-black px-8 py-3 rounded-full hover:bg-black hover:text-white transition-all">
-            EN / AR
-        </button>
+        <button onclick="toggleMenu(); toggleLanguage()" class="text-xl font-english mt-8 font-bold border-2 border-black text-black px-8 py-3 rounded-full hover:bg-black hover:text-white transition-all">EN / AR</button>
     </div>
 </nav>
+
+<!-- Careers Modal -->
+<div id="careers-modal" class="hidden fixed inset-0 z-[5000] bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in">
+    <div class="min-h-screen flex items-center justify-center p-6">
+        <div class="w-full max-w-2xl bg-white border border-gray-200 shadow-2xl relative p-8 md:p-12 rounded-xl">
+            <button onclick="closeModal('careers-modal')" class="absolute top-6 left-6 rtl:left-6 rtl:right-auto p-2 border rounded-full hover:bg-black hover:text-white transition-colors ltr:left-auto ltr:right-6">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-3xl font-bold mb-2 text-center" data-i18n="careers_title">انضم إلى فريقنا</h2>
+            <p class="text-center text-gray-500 mb-8 text-sm" data-i18n="careers_subtitle">املأ النموذج أدناه وسيتم إرسال طلبك مباشرة إلى فريق الموارد البشرية.</p>
+            <form onsubmit="submitCareerForm(event)" class="space-y-5">
+                <div><label class="block text-xs font-bold uppercase mb-2 tracking-wider" data-i18n="form_name">الاسم الكامل</label><input type="text" id="career-name" required class="w-full p-3 bg-gray-50 border border-gray-200 focus:border-black outline-none rounded-md"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold uppercase mb-2 tracking-wider" data-i18n="form_phone">رقم الجوال</label><input type="tel" id="career-phone" required class="w-full p-3 bg-gray-50 border border-gray-200 focus:border-black outline-none rounded-md" dir="ltr"></div>
+                    <div><label class="block text-xs font-bold uppercase mb-2 tracking-wider" data-i18n="form_email">البريد الإلكتروني</label><input type="email" id="career-email" required class="w-full p-3 bg-gray-50 border border-gray-200 focus:border-black outline-none rounded-md" dir="ltr"></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase mb-2 tracking-wider" data-i18n="form_position">المسمى الوظيفي</label>
+                    <select id="career-position" required class="w-full p-3 bg-gray-50 border border-gray-200 focus:border-black outline-none rounded-md">
+                        <option value="" disabled selected data-i18n="select_position">اختر التخصص...</option><option value="Architect">مهندس معماري (Architect)</option><option value="Interior Designer">مصمم داخلي (Interior Designer)</option><option value="Civil Engineer">مهندس مدني (Civil Engineer)</option><option value="Project Manager">مدير مشاريع (Project Manager)</option><option value="Site Engineer">مهندس موقع (Site Engineer)</option><option value="Administrative">إداري / سكرتارية (Admin)</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-black text-white font-bold py-4 hover:opacity-80 transition-opacity uppercase tracking-widest mt-4 rounded-md" data-i18n="form_send_app">إرسال الطلب</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Modal -->
+<div id="contact-modal" class="hidden fixed inset-0 z-[5000] bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in">
+    <div class="min-h-screen flex items-center justify-center p-6">
+        <div class="w-full max-w-4xl bg-white border border-gray-200 shadow-2xl relative p-10 md:p-16 rounded-xl">
+            <button onclick="closeModal('contact-modal')" class="absolute top-6 left-6 rtl:left-6 rtl:right-auto p-2 border rounded-full hover:bg-black hover:text-white transition-colors ltr:left-auto ltr:right-6">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="flex flex-col justify-center bg-black text-white p-8 rounded-xl">
+                    <h2 class="text-3xl font-bold mb-8" data-i18n="contact_header">تواصل معنا</h2>
+                    <div class="space-y-6">
+                        <div><h4 class="text-xs uppercase tracking-widest opacity-70 mb-1" data-i18n="phone_label">الهاتف</h4><a href="tel:0582226234" class="text-xl font-english font-light hover:underline" dir="ltr">058 222 6234</a></div>
+                        <div><h4 class="text-xs uppercase tracking-widest opacity-70 mb-1" data-i18n="email_label">البريد الإلكتروني</h4><a href="mailto:info@truedraft.com.sa" class="text-lg font-english font-light hover:underline">info@truedraft.com.sa</a></div>
+                        <div><h4 class="text-xs uppercase tracking-widest opacity-70 mb-1" data-i18n="location_label">الموقع</h4><p class="text-lg font-light" data-i18n="location_val">الرياض، المملكة العربية السعودية</p></div>
+                    </div>
+                </div>
+                <div>
+                    <form onsubmit="submitContactForm(event)" class="space-y-6">
+                        <div><label class="block text-sm font-bold mb-2 uppercase" data-i18n="form_name">الاسم</label><input type="text" id="contact-name" class="w-full p-4 bg-gray-50 border-b-2 border-transparent focus:border-black outline-none rounded-sm"></div>
+                        <div><label class="block text-sm font-bold mb-2 uppercase" data-i18n="form_email">البريد الإلكتروني</label><input type="email" id="contact-email" class="w-full p-4 bg-gray-50 border-b-2 border-transparent focus:border-black outline-none rounded-sm"></div>
+                        <div><label class="block text-sm font-bold mb-2 uppercase" data-i18n="form_message">الرسالة</label><textarea id="contact-message" class="w-full p-4 bg-gray-50 border-b-2 border-transparent focus:border-black outline-none h-32 rounded-sm"></textarea></div>
+                        <button type="submit" class="w-full bg-black text-white font-bold py-4 hover:opacity-80 transition-opacity uppercase tracking-widest rounded-md" data-i18n="form_send">إرسال</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
