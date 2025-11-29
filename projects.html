@@ -13,7 +13,7 @@
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;700;900&family=Manrope:wght@200;300;400;500;700;800&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Cairo', sans-serif; } .grayscale-img { filter: grayscale(100%); transition: filter 0.5s ease; } .group:hover .grayscale-img { filter: grayscale(0%); } .animate-fade-in { animation: fadeIn 0.5s ease-in-out; } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } #gallery-thumbs img.active { border: 2px solid white; opacity: 1; }</style>
+    <style>body { font-family: 'Cairo', sans-serif; } .animate-fade-in { animation: fadeIn 0.5s ease-in-out; } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } #gallery-thumbs img.active { border: 2px solid white; opacity: 1; }</style>
 </head>
 <body class="bg-white text-black antialiased flex flex-col min-h-screen">
 
@@ -213,7 +213,7 @@
                 <span id="detail-cat" class="text-xs font-bold text-[#C69C6D] uppercase tracking-widest mb-4 block"></span>
                 <h2 id="detail-title" class="text-3xl md:text-4xl font-bold mb-6 leading-tight"></h2>
                 <div id="detail-desc" class="text-gray-600 leading-loose text-sm font-light mb-8"></div>
-                <div id="detail-facts" class="border-t pt-8 mt-8 grid grid-cols-2 gap-x-8 gap-y-8"></div>
+                <div id="detail-facts" class="border-t border-gray-100 pt-2 mt-8"></div>
             </div>
         </div>
     </div>
@@ -252,6 +252,7 @@
                 careers_title: 'انضم إلى فريقنا', careers_subtitle: 'املأ النموذج أدناه وسيتم إرسال طلبك مباشرة.',
                 form_name: 'الاسم', form_phone: 'رقم الجوال', form_email: 'البريد الإلكتروني', form_position: 'المسمى الوظيفي', form_message: 'الرسالة', form_send: 'إرسال', form_send_app: 'إرسال الطلب', select_position: 'اختر التخصص...',
                 privacy_intro: 'مقدمة:', privacy_text_1: '...', terms_intro: 'مقدمة:', terms_text_1: '...',
+                view_details_btn: 'استعراض التفاصيل',
                 p1_title: 'مشروع مسكه ليفلز', p1_category: 'سكني / تجاري', p1_location: 'الرياض', p1_desc: 'مشروع مسكه ليفلز يتميز بتصميمه العصري الذي يدمج بين الفخامة والعملية، موفراً بيئة سكنية وتجارية متكاملة.', p1_details: [ { label: 'العميل', value: 'شركة مسكه' }, { label: 'نطاق العمل', value: 'تصميم وتنفيذ' }, { label: 'الحالة', value: 'مكتمل' }, { label: 'السنة', value: '2024' } ],
                 p2_title: 'فيلا خاصة', p2_category: 'سكني', p2_location: 'الرياض', p2_desc: 'فيلا خاصة صممت لتوفير أقصى درجات الراحة والخصوصية، مع اهتمام دقيق بالتفاصيل الداخلية والخارجية.', p2_details: [ { label: 'العميل', value: 'خاص' }, { label: 'نطاق العمل', value: 'تصميم داخلي' }, { label: 'الحالة', value: 'مكتمل' }, { label: 'السنة', value: '2023' } ],
                 p3_title: 'مقهى جيره', p3_category: 'تجاري', p3_location: 'الرياض', p3_desc: 'مقهى جيره يقدم تجربة ضيافة فريدة في أجواء مستوحاة من التراث بلمسة حديثة.', p3_details: [ { label: 'العميل', value: 'جيره كافيه' }, { label: 'نطاق العمل', value: 'تصميم وتنفيذ' }, { label: 'الحالة', value: 'مكتمل' }, { label: 'السنة', value: '2023' } ]
@@ -263,6 +264,7 @@
                 careers_title: 'Join Our Team', careers_subtitle: 'Fill the form below to send your application.',
                 form_name: 'Name', form_phone: 'Mobile', form_email: 'Email', form_position: 'Position', form_message: 'Message', form_send: 'Send', form_send_app: 'Submit Application', select_position: 'Select Position...',
                 privacy_intro: 'Introduction:', privacy_text_1: '...', terms_intro: 'Introduction:', terms_text_1: '...',
+                view_details_btn: 'View Details',
                 p1_title: 'Masqh Levels Project', p1_category: 'Residential / Commercial', p1_location: 'Riyadh', p1_desc: 'The Masqh Levels project features a modern design that combines luxury and functionality, providing an integrated residential and commercial environment.', p1_details: [ { label: 'Client', value: 'Masqh Co.' }, { label: 'Scope', value: 'Design & Build' }, { label: 'Status', value: 'Completed' }, { label: 'Year', value: '2024' } ],
                 p2_title: 'Private Villa', p2_category: 'Residential', p2_location: 'Riyadh', p2_desc: 'A private villa designed to provide maximum comfort and privacy, with meticulous attention to interior and exterior details.', p2_details: [ { label: 'Client', value: 'Private' }, { label: 'Scope', value: 'Interior Design' }, { label: 'Status', value: 'Completed' }, { label: 'Year', value: '2023' } ],
                 p3_title: 'Jirah Cafe', p3_category: 'Commercial', p3_location: 'Riyadh', p3_desc: 'Jirah Cafe offers a unique hospitality experience in an atmosphere inspired by heritage with a modern touch.', p3_details: [ { label: 'Client', value: 'Jirah Cafe' }, { label: 'Scope', value: 'Design & Build' }, { label: 'Status', value: 'Completed' }, { label: 'Year', value: '2023' } ]
@@ -304,13 +306,16 @@
             if(!grid) return;
             const currentTranslations = translations[currentLang] || translations.ar;
             grid.innerHTML = projects.map(p => `
-                <div class="group cursor-pointer relative" onclick="openProject(${p.id})">
-                    <div class="overflow-hidden aspect-square bg-gray-100 shadow-md">
-                        <img src="${p.cover}" alt="${currentTranslations[p.title_key]}" class="w-full h-full object-cover grayscale-img transition-all duration-500 transform group-hover:scale-110">
+                <div class="group cursor-pointer" onclick="openProject(${p.id})">
+                    <div class="overflow-hidden aspect-square bg-gray-100 shadow-md rounded-lg">
+                        <img src="${p.cover}" alt="${currentTranslations[p.title_key]}" class="w-full h-full object-cover transition-all duration-500 transform group-hover:scale-110">
                     </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
-                        <h3 class="text-xl font-bold text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.8)]">${currentTranslations[p.title_key]}</h3>
-                        <p class="text-white/80 text-sm [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">${currentTranslations[p.category_key]}</p>
+                    <div class="pt-4">
+                        <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">${currentTranslations[p.category_key]}</p>
+                        <h3 class="text-lg font-bold text-black mt-1">${currentTranslations[p.title_key]}</h3>
+                        <span class="mt-2 inline-block text-sm font-bold text-black group-hover:text-[#C69C6D] transition-colors">
+                            ${currentTranslations['view_details_btn']} &rarr;
+                        </span>
                     </div>
                 </div>
             `).join('');
@@ -326,9 +331,9 @@
             const factsContainer = document.getElementById('detail-facts');
             const projectDetails = currentTranslations[project.details_key] || [];
             factsContainer.innerHTML = projectDetails.map(fact => `
-                <div>
-                    <span class="block text-sm text-gray-500 font-bold">${fact.label}</span>
-                    <p class="font-bold text-black text-lg mt-2">${fact.value}</p>
+                <div class="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0">
+                    <span class="text-sm font-medium text-gray-500">${fact.label}</span>
+                    <p class="font-bold text-black text-base text-right">${fact.value}</p>
                 </div>
             `).join('');
         }
