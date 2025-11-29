@@ -203,6 +203,7 @@
             <button onclick="closeProjectDetail()" class="absolute top-4 left-4 z-50 bg-white/90 rounded-full p-2 hover:scale-110 transition shadow-lg rtl:left-4 rtl:right-auto ltr:right-4 ltr:left-auto"><svg width="24" height="24" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
             <div class="w-full md:w-[60%] h-1/2 md:h-auto md:aspect-[4/3] bg-black relative flex flex-col">
                 <div id="gallery-container" class="w-full flex-1 relative group">
+                    <div id="gallery-image-wrapper" class="absolute inset-0"></div>
                     <button onclick="prevGallery()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur text-white p-3 rounded-full hover:bg-white hover:text-black transition rtl:right-4 rtl:left-auto ltr:left-4 ltr:right-auto opacity-0 group-hover:opacity-100"><svg class="w-6 h-6 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
                     <button onclick="nextGallery()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 backdrop-blur text-white p-3 rounded-full hover:bg-white hover:text-black transition rtl:left-4 rtl:right-auto ltr:right-4 ltr:left-auto opacity-0 group-hover:opacity-100"><svg class="w-6 h-6 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
                 </div>
@@ -357,12 +358,8 @@
 
         function updateGallery() {
             if (!activeProject) return;
-            const container = document.getElementById('gallery-container');
-            container.insertAdjacentHTML('afterbegin', `<img src="${activeProject.images[galleryIndex]}" class="w-full h-full object-cover animate-fade-in" alt="Gallery image ${galleryIndex + 1}">`);
-            if (container.children.length > 2) { // Allow for button elements
-                const oldImg = Array.from(container.children).find(el => el.tagName === 'IMG');
-                 if(oldImg && oldImg !== container.firstChild) oldImg.remove();
-            }
+            const imageWrapper = document.getElementById('gallery-image-wrapper');
+            imageWrapper.innerHTML = `<img src="${activeProject.images[galleryIndex]}" class="w-full h-full object-cover animate-fade-in" alt="Gallery image ${galleryIndex + 1}">`;
 
             const thumbs = document.querySelectorAll('#gallery-thumbs img');
             thumbs.forEach((thumb, index) => {
