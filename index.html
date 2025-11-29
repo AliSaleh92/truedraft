@@ -199,14 +199,16 @@
                 <h2 class="text-3xl font-bold mb-8" data-i18n="privacy">سياسة الخصوصية</h2>
                 <div class="prose max-w-none text-sm leading-relaxed text-gray-600 space-y-6">
                     <p class="font-bold" data-i18n="privacy_intro">مقدمة:</p>
-                    <p data-i18n="privacy_text_1">في شركة ترو درفت (True Draft)...</p>
+                    <p data-i18n="privacy_text_1">...</p>
                     <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h1">1. المعلومات التي نجمعها</h3>
+                    <p data-i18n="privacy_text_2">...</p>
                     <ul class="list-disc list-inside">
                         <li data-i18n="privacy_li_1">...</li>
                         <li data-i18n="privacy_li_2">...</li>
                         <li data-i18n="privacy_li_3">...</li>
                     </ul>
                     <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h2">2. كيف نستخدم معلوماتك؟</h3>
+                    <p data-i18n="privacy_text_3">...</p>
                     <ul class="list-disc list-inside"><li data-i18n="privacy_li_4">...</li><li data-i18n="privacy_li_5">...</li><li data-i18n="privacy_li_6">...</li><li data-i18n="privacy_li_7">...</li></ul>
                     <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h3">3. مشاركة البيانات</h3>
                     <p data-i18n="privacy_text_4">...</p>
@@ -214,6 +216,7 @@
                     <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h4">4. أمن البيانات</h3>
                     <p data-i18n="privacy_text_5">...</p>
                     <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h5">5. حقوقك</h3>
+                    <p data-i18n="privacy_text_6">...</p>
                     <ul class="list-disc list-inside"><li data-i18n="privacy_li_10">...</li><li data-i18n="privacy_li_11">...</li><li data-i18n="privacy_li_12">...</li></ul>
                     <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h6">6. ملفات تعريف الارتباط (Cookies)</h3>
                     <p data-i18n="privacy_text_7">...</p>
@@ -259,12 +262,143 @@
         let currentSlide = 0;
         let currentLang = localStorage.getItem('lang') || 'ar';
         const translations = {
-            ar: { home: 'الرئيسية', about: 'عن ترو درفت', projects: 'مشاريعنا', blog: 'المدونة', contact: 'تواصل معنا', careers: 'التوظيف', about_title: 'عن True Draft', about_text: 'تأسست True Draft على مبدأ أن كل مشروع مميز يبدأ من مسودة حقيقية… مسودة دقيقة، صادقة، وواضحة الاتجاه. نحن نصنع مشاريع تُبنى على رؤية أصلية لا تنحرف، وتفاصيل تُصاغ بعناية منذ اللحظة الأولى وحتى اكتمال التنفيذ.', vision_title: 'رؤيتنا', vision_text: 'أن نكون مرجعاً في صناعة التصميم والبناء، حيث تبدأ المشاريع من أساس صحيح وتكتمل بمعايير عالية تعكس أصالة الفكرة الأولى.', mission_title: 'رسالتنا', mission_text: 'تقديم رحلة تصميم وبناء شفافة ومدروسة، نحافظ فيها على روح المشروع منذ مخططه الأول وحتى تسليمه كمنجز متقن ورفيع.', goal_title: 'هدفنا', goal_text: 'صياغة حلول تصميم وبناء ترتكز على فكرة نقيّة وخطة محكمة، لتتحول إلى واقع يحمل نفس صدق وجودة المسودة الأولى.', contact_header: 'تواصل معنا', email_label: 'البريد الإلكتروني', phone_label: 'اتصل بنا', location_label: 'الموقع', location_val: 'الرياض، المملكة العربية السعودية', rights: 'جميع الحقوق محفوظة لشركة True Draft © 2025', privacy: 'سياسة الخصوصية', terms: 'الشروط والأحكام', careers_title: 'انضم إلى فريقنا', careers_subtitle: 'املأ النموذج أدناه وسيتم إرسال طلبك مباشرة.', form_name: 'الاسم', form_phone: 'رقم الجوال', form_email: 'البريد الإلكتروني', form_position: 'المسمى الوظيفي', form_message: 'الرسالة', form_send: 'إرسال', form_send_app: 'إرسال الطلب', select_position: 'اختر التخصص...', privacy_intro: 'مقدمة:', privacy_text_1: 'في شركة ترو درفت (True Draft)، ندرك أن مشاريع البناء والتصاميم هي أمور شخصية وهامة جداً لعملائنا...', privacy_h1: '1. المعلومات التي نجمعها', privacy_text_2: 'عند استخدامك لموقعنا أو طلب خدمة، قد نطلب منك المعلومات التالية:', privacy_li_1: 'بيانات الهوية: الاسم الكامل.', privacy_li_2: 'بيانات الاتصال: رقم الهاتف، البريد الإلكتروني، والعنوان.', privacy_li_3: 'بيانات المشروع: موقع الأرض، المساحة، صور الموقع، المخططات الهندسية السابقة، صور الصكوك أو التراخيص (لغرض الدراسة والتسعير).', privacy_h2: '2. كيف نستخدم معلوماتك؟', privacy_text_3: 'نستخدم البيانات التي نجمعها للأغراض التالية فقط:', privacy_li_4: 'دراسة طلبك وتقديم عروض أسعار دقيقة ومخصصة لمشروعك.', privacy_li_5: 'التواصل معك لتحديد مواعيد المعاينة أو مناقشة التصاميم.', privacy_li_6: 'إتمام إجراءات التعاقد واستخراج التراخيص (إذا كانت ضمن نطاق العمل).', privacy_li_7: 'تحسين خدماتنا وتجربة المستخدم على الموقع.', privacy_h3: '3. مشاركة البيانات', privacy_text_4: 'نحن لا نقوم ببيع أو تأجير بياناتك الشخصية لأي طرف ثالث...', privacy_li_8: 'شركاء التنفيذ: مثل الموردين أو المقاولين من الباطن...', privacy_li_9: 'الجهات الحكومية: في حال طُلب منا ذلك...', privacy_h4: '4. أمن البيانات', privacy_text_5: 'نتخذ كافة التدابير الأمنية...', privacy_h5: '5. حقوقك', privacy_text_6: 'يحق لك في أي وقت:', privacy_li_10: 'الاستفسار عن البيانات...', privacy_li_11: 'طلب تصحيح...', privacy_li_12: 'طلب حذف بياناتك...', privacy_h6: '6. ملفات تعريف الارتباط (Cookies)', privacy_text_7: 'قد يستخدم موقعنا...', privacy_h7: '7. اتصل بنا', privacy_text_8: 'إذا كان لديك أي استفسار...', terms_intro: 'مقدمة:', terms_text_1: 'أهلاً بكم في موقع شركة ترو درفت...', terms_h1: '1. التعريفات', terms_li_1: '"الشركة" أو "نحن"...', terms_li_2: '"العميل" أو "أنت"...', terms_li_3: '"الخدمات"...', terms_h2: '2. طبيعة الخدمات والتعاقد', terms_li_4: '...', terms_li_5: '...', terms_li_6: '...', terms_h3: '3. حقوق الملكية الفكرية', terms_li_7: '...', terms_li_8: '...', terms_h4: '4. الأسعار والدفعات', terms_li_9: '...', terms_li_10: '...', terms_h5: '5. مسؤولية العميل', terms_li_11: '...', terms_li_12: '...', terms_h6: '6. إخلاء المسؤولية', terms_text_2: '...', terms_h7: '7. القانون الواجب التطبيق', terms_text_3: '...', terms_h8: '8. التعديلات', terms_text_4: '...' },
-            en: { home: 'Home', about: 'About Us', projects: 'Projects', blog: 'Blog', contact: 'Contact', careers: 'Careers', about_title: 'About True Draft', about_text: 'True Draft was founded on the principle that every distinctive project begins with a true draft... a precise, honest, and clear-direction draft. We craft projects built on an original vision that does not deviate, with details meticulously shaped from the very first moment until completion.', vision_title: 'Vision', vision_text: 'To be a benchmark in the design and build industry, where projects start from a correct foundation and complete with high standards reflecting the originality of the initial idea.', mission_title: 'Mission', mission_text: 'To deliver a transparent and thoughtful design and build journey, preserving the project\'s spirit from its first blueprint to its delivery as a refined accomplishment.', goal_title: 'Goal', goal_text: 'To formulate design and build solutions grounded in a pure idea and a solid plan, transforming into reality carrying the same honesty and quality of the first draft.', contact_header: 'Get in Touch', email_label: 'Email', phone_label: 'Call Us', location_label: 'Location', location_val: 'Riyadh, Saudi Arabia', rights: 'All rights reserved True Draft © 2025', privacy: 'Privacy Policy', terms: 'Terms & Conditions', careers_title: 'Join Our Team', careers_subtitle: 'Fill the form below to send your application.', form_name: 'Name', form_phone: 'Mobile', form_email: 'Email', form_position: 'Position', form_message: 'Message', form_send: 'Send', form_send_app: 'Submit Application', select_position: 'Select Position...', privacy_intro: 'Introduction:', privacy_text_1: 'At True Draft...', privacy_h1: '1. Information We Collect', privacy_text_2: '...', privacy_li_1: 'Identity Data...', privacy_li_2: 'Contact Data...', privacy_li_3: 'Project Data...', privacy_h2: '2. How We Use Your Information?', privacy_text_3: '...', privacy_li_4: 'Studying...', privacy_li_5: 'Communicating...', privacy_li_6: 'Completing...', privacy_li_7: 'Improving...', privacy_h3: '3. Data Sharing', privacy_text_4: '...', privacy_li_8: 'Execution Partners...', privacy_li_9: 'Government Authorities...', privacy_h4: '4. Data Security', privacy_text_5: '...', privacy_h5: '5. Your Rights', privacy_text_6: '...', privacy_li_10: 'Inquire...', privacy_li_11: 'Request correction...', privacy_li_12: 'Request deletion...', privacy_h6: '6. Cookies', privacy_text_7: '...', privacy_h7: '7. Contact Us', privacy_text_8: '...', terms_intro: 'Introduction:', terms_text_1: 'Welcome to True Draft...', terms_h1: '1. Definitions', terms_li_1: 'Company...', terms_li_2: 'Client...', terms_li_3: 'Services...', terms_h2: '2. Nature of Services...', terms_li_4: '...', terms_li_5: '...', terms_li_6: '...', terms_h3: '3. Intellectual Property...', terms_li_7: '...', terms_li_8: '...', terms_h4: '4. Prices...', terms_li_9: '...', terms_li_10: '...', terms_h5: '5. Client Responsibilities', terms_li_11: '...', terms_li_12: '...', terms_h6: '6. Disclaimer', terms_text_2: '...', terms_h7: '7. Governing Law', terms_text_3: '...', terms_h8: '8. Amendments', terms_text_4: '...' }
-        };
+            ar: {
+                home: 'الرئيسية', about: 'عن ترو درفت', projects: 'مشاريعنا', blog: 'المدونة', contact: 'تواصل معنا', careers: 'التوظيف',
+                about_title: 'عن True Draft', about_text: 'تأسست True Draft على مبدأ أن كل مشروع مميز يبدأ من مسودة حقيقية… مسودة دقيقة، صادقة، وواضحة الاتجاه. نحن نصنع مشاريع تُبنى على رؤية أصلية لا تنحرف، وتفاصيل تُصاغ بعناية منذ اللحظة الأولى وحتى اكتمال التنفيذ.',
+                vision_title: 'رؤيتنا', vision_text: 'أن نكون مرجعاً في صناعة التصميم والبناء، حيث تبدأ المشاريع من أساس صحيح وتكتمل بمعايير عالية تعكس أصالة الفكرة الأولى.',
+                mission_title: 'رسالتنا', mission_text: 'تقديم رحلة تصميم وبناء شفافة ومدروسة، نحافظ فيها على روح المشروع منذ مخططه الأول وحتى تسليمه كمنجز متقن ورفيع.',
+                goal_title: 'هدفنا', goal_text: 'صياغة حلول تصميم وبناء ترتكز على فكرة نقيّة وخطة محكمة، لتتحول إلى واقع يحمل نفس صدق وجودة المسودة الأولى.',
+                contact_header: 'تواصل معنا', email_label: 'البريد الإلكتروني', phone_label: 'اتصل بنا', location_label: 'الموقع', location_val: 'الرياض، المملكة العربية السعودية', rights: 'جميع الحقوق محفوظة لشركة True Draft © 2025',
+                privacy: 'سياسة الخصوصية', terms: 'الشروط والأحكام',
+                careers_title: 'انضم إلى فريقنا', careers_subtitle: 'املأ النموذج أدناه وسيتم إرسال طلبك مباشرة.',
+                form_name: 'الاسم', form_phone: 'رقم الجوال', form_email: 'البريد الإلكتروني', form_position: 'المسمى الوظيفي', form_message: 'الرسالة', form_send: 'إرسال', form_send_app: 'إرسال الطلب', select_position: 'اختر التخصص...',
+                
+                [cite_start]// Privacy Policy (Arabic) [cite: 1-15]
+                privacy_intro: 'مقدمة:',
+                privacy_text_1: 'في شركة ترو درفت (True Draft)، ندرك أن مشاريع البناء والتصاميم هي أمور شخصية وهامة جداً لعملائنا. نحن نلتزم بحماية خصوصيتك وبياناتك الشخصية والهندسية، وتوضح هذه السياسة كيفية جمعنا واستخدامنا لهذه المعلومات.',
+                privacy_h1: '1. المعلومات التي نجمعها',
+                privacy_text_2: 'عند استخدامك لموقعنا أو طلب خدمة، قد نطلب منك المعلومات التالية:',
+                privacy_li_1: 'بيانات الهوية: الاسم الكامل.',
+                privacy_li_2: 'بيانات الاتصال: رقم الهاتف، البريد الإلكتروني، والعنوان.',
+                privacy_li_3: 'بيانات المشروع: موقع الأرض، المساحة، صور الموقع، المخططات الهندسية السابقة، صور الصكوك أو التراخيص (لغرض الدراسة والتسعير).',
+                privacy_h2: '2. كيف نستخدم معلوماتك؟',
+                privacy_text_3: 'نستخدم البيانات التي نجمعها للأغراض التالية فقط:',
+                privacy_li_4: 'دراسة طلبك وتقديم عروض أسعار دقيقة ومخصصة لمشروعك.',
+                privacy_li_5: 'التواصل معك لتحديد مواعيد المعاينة أو مناقشة التصاميم.',
+                privacy_li_6: 'إتمام إجراءات التعاقد واستخراج التراخيص (إذا كانت ضمن نطاق العمل).',
+                privacy_li_7: 'تحسين خدماتنا وتجربة المستخدم على الموقع.',
+                privacy_h3: '3. مشاركة البيانات',
+                privacy_text_4: 'نحن لا نقوم ببيع أو تأجير بياناتك الشخصية لأي طرف ثالث. ومع ذلك، قد نشارك بعض البيانات الضرورية في الحالات التالية فقط:',
+                privacy_li_8: 'شركاء التنفيذ: مثل الموردين أو المقاولين من الباطن لغرض حساب الكميات أو التوريد لمشروعك الخاص.',
+                privacy_li_9: 'الجهات الحكومية: في حال طُلب منا ذلك بموجب القانون أو لاستخراج تراخيص البناء الخاصة بك.',
+                privacy_h4: '4. أمن البيانات',
+                privacy_text_5: 'نتخذ كافة التدابير الأمنية التقنية والإدارية المناسبة لحماية بياناتك ومخططات منزلك من الوصول غير المصرح به، أو التغيير، أو الإفصاح.',
+                privacy_h5: '5. حقوقك',
+                privacy_text_6: 'يحق لك في أي وقت:',
+                privacy_li_10: 'الاستفسار عن البيانات التي نحتفظ بها عنك.',
+                privacy_li_11: 'طلب تصحيح أي معلومات خاطئة.',
+                privacy_li_12: 'طلب حذف بياناتك من سجلاتنا (بشرط ألا يتعارض ذلك مع التزاماتنا القانونية أو التعاقدية القائمة).',
+                privacy_h6: '6. ملفات تعريف الارتباط (Cookies)',
+                privacy_text_7: 'قد يستخدم موقعنا ملفات تعريف الارتباط لتحسين تجربتك وتذكر تفضيلاتك. يمكنك تعطيلها من إعدادات المتصفح الخاص بك، ولكن قد يؤثر ذلك على عمل بعض أجزاء الموقع.',
+                privacy_h7: '7. اتصل بنا',
+                privacy_text_8: 'إذا كان لديك أي استفسار حول سياسة الخصوصية، يسعدنا تواصلك معنا عبر: البريد الإلكتروني: info@truedraft.com.sa - الهاتف: 0582226234',
 
-        // loadSharedComponents Removed as it is now hardcoded.
-        // async function loadSharedComponents() { ... }
+                [cite_start]// Terms and Conditions (Arabic) [cite: 16-36]
+                terms_intro: 'مقدمة:',
+                terms_text_1: 'أهلاً بكم في موقع شركة ترو درفت (True Draft) للمقاولات العامة. يرجى قراءة هذه الشروط والأحكام بعناية قبل استخدام الموقع أو طلب أي من خدماتنا. بمجرد استخدامك لهذا الموقع، فإنك تقر بموافقتك الكاملة على هذه الشروط. إذا كنت لا توافق على أي جزء منها، يرجى التوقف عن استخدام الموقع فوراً.',
+                terms_h1: '1. التعريفات',
+                terms_li_1: '"الشركة" أو "نحن": يقصد بها شركة ترو درفت (True Draft) للمقاولات العامة.',
+                terms_li_2: '"العميل" أو "أنت": يقصد به أي فرد أو جهة اعتبارية تقوم بزيارة الموقع أو طلب خدماتنا.',
+                terms_li_3: '"الخدمات": تشمل التصميم المعماري والداخلي، التنفيذ، الإشراف، وأي خدمات هندسية أو استشارية أخرى نعرضها.',
+                terms_h2: '2. طبيعة الخدمات والتعاقد',
+                terms_li_4: 'إن المعلومات والصور المعروضة على هذا الموقع هي لغرض التعريف بخدماتنا وعرض سابقة أعمالنا.',
+                terms_li_5: 'طلب "عرض سعر" عبر الموقع لا يعتبر عقداً ملزماً للشركة بالبدء في التنفيذ.',
+                terms_li_6: 'يخضع البدء الفعلي لأي مشروع (تصميم أو مقاولات) لتوقيع عقد رسمي منفصل ومكتوب يحدد التزامات الطرفين، الدفعات، الجدول الزمني، والمواصفات الفنية، وهو المرجع القانوني الوحيد بين الطرفين.',
+                terms_h3: '3. حقوق الملكية الفكرية',
+                terms_li_7: 'جميع المحتويات الموجودة على هذا الموقع (بما في ذلك النصوص، التصاميم الهندسية، المخططات، الشعارات، صور المشاريع المنفذة، والرسومات ثلاثية الأبعاد) هي ملكية حصرية لشركة "ترو درفت" ومحمية بموجب أنظمة الملكية الفكرية في المملكة العربية السعودية.',
+                terms_li_8: 'يمنع منعاً باتاً نسخ، إعادة إنتاج، أو استخدام أي من تصاميمنا لأغراض تجارية أو شخصية دون إذن كتابي صريح من إدارة الشركة.',
+                terms_h4: '4. الأسعار والدفعات',
+                terms_li_9: 'الأسعار التقديرية (إن وجدت على الموقع) قابلة للتغيير بناءً على أسعار مواد البناء في السوق ومواصفات المشروع الدقيقة.',
+                terms_li_10: 'يلتزم العميل بدفع المستحقات المالية وفقاً للدفعات المتفق عليها في العقد الرسمي المبرم لاحقاً.',
+                terms_h5: '5. مسؤولية العميل',
+                terms_li_11: 'أنت مسؤول عن صحة البيانات والمعلومات التي تقدمها لنا (مثل مساحة الأرض، الصكوك، التراخيص الحكومية).',
+                terms_li_12: 'تخلي الشركة مسؤوليتها عن أي تأخير أو غرامات ناتجة عن عدم صحة أوراق العميل أو عدم استخراجه للتراخيص اللازمة ما لم ينص العقد على تولينا هذه المهمة.',
+                terms_h6: '6. إخلاء المسؤولية',
+                terms_text_2: 'نسعى جاهدين لضمان دقة المعلومات على موقعنا، لكننا لا نقدم أي ضمانات بأن الموقع سيكون خالياً من الأخطاء المطبعية أو التقنية. استخدامك للموقع يكون على مسؤوليتك الخاصة.',
+                terms_h7: '7. القانون الواجب التطبيق',
+                terms_text_3: 'تخضع هذه الشروط والأحكام للأنظمة واللوائح المعمول بها في المملكة العربية السعودية. في حال نشوء أي نزاع، يتم اللجوء إلى الجهات القضائية المختصة في مدينة الرياض.',
+                terms_h8: '8. التعديلات',
+                terms_text_4: 'تحتفظ "ترو درفت" بالحق في تعديل هذه الشروط في أي وقت. يعتبر استمرارك في استخدام الموقع بعد التعديلات موافقة ضمنية عليها.'
+            },
+            en: {
+                home: 'Home', about: 'About Us', projects: 'Projects', blog: 'Blog', contact: 'Contact', careers: 'Careers',
+                about_title: 'About True Draft', about_text: 'True Draft was founded on the principle that every distinctive project begins with a true draft... a precise, honest, and clear-direction draft. We craft projects built on an original vision that does not deviate, with details meticulously shaped from the very first moment until completion.',
+                vision_title: 'Vision', vision_text: 'To be a benchmark in the design and build industry, where projects start from a correct foundation and complete with high standards reflecting the originality of the initial idea.',
+                mission_title: 'Mission', mission_text: 'To deliver a transparent and thoughtful design and build journey, preserving the project\'s spirit from its first blueprint to its delivery as a refined accomplishment.',
+                goal_title: 'Goal', goal_text: 'To formulate design and build solutions grounded in a pure idea and a solid plan, transforming into reality carrying the same honesty and quality of the first draft.',
+                contact_header: 'Get in Touch', email_label: 'Email', phone_label: 'Call Us', location_label: 'Location', location_val: 'Riyadh, Saudi Arabia', rights: 'All rights reserved True Draft © 2025',
+                privacy: 'Privacy Policy', terms: 'Terms & Conditions',
+                careers_title: 'Join Our Team', careers_subtitle: 'Fill the form below to send your application.',
+                form_name: 'Name', form_phone: 'Mobile', form_email: 'Email', form_position: 'Position', form_message: 'Message', form_send: 'Send', form_send_app: 'Submit Application', select_position: 'Select Position...',
+                
+                [cite_start]// Privacy Policy (English) [cite: 61-76]
+                privacy_intro: 'Introduction:',
+                privacy_text_1: 'At True Draft, we understand that construction projects and home designs are highly personal and significant to our clients. We are committed to protecting your privacy and your personal and engineering data. This policy outlines how we collect, use, and protect this information.',
+                privacy_h1: '1. Information We Collect',
+                privacy_text_2: 'When you use our website or request a service, we may collect the following information:',
+                privacy_li_1: 'Identity Data: Full name.',
+                privacy_li_2: 'Contact Data: Phone number, email address, and location.',
+                privacy_li_3: 'Project Data: Land location, area size, site photos, previous engineering plans, and copies of title deeds or permits (for study and pricing purposes).',
+                privacy_h2: '2. How We Use Your Information?',
+                privacy_text_3: 'We use the data we collect solely for the following purposes:',
+                privacy_li_4: 'Analyzing your request to provide accurate, customized quotes for your project.',
+                privacy_li_5: 'Contacting you to schedule site visits or discuss designs.',
+                privacy_li_6: 'Completing contracting procedures and obtaining permits (if within the scope of work).',
+                privacy_li_7: 'Improving our services and user experience on the website.',
+                privacy_h3: '3. Data Sharing',
+                privacy_text_4: 'We do not sell or rent your personal data to any third parties. However, we may share necessary data in the following cases only:',
+                privacy_li_8: 'Execution Partners: Such as suppliers or subcontractors, strictly for the purpose of quantity surveying or material supply for your specific project.',
+                privacy_li_9: 'Government Authorities: If required by law or to process your building permits.',
+                privacy_h4: '4. Data Security',
+                privacy_text_5: 'We implement appropriate technical and administrative security measures to protect your data and home blueprints from unauthorized access, alteration, or disclosure.',
+                privacy_h5: '5. Your Rights',
+                privacy_text_6: 'You have the right at any time to:',
+                privacy_li_10: 'Inquire about the data we hold about you.',
+                privacy_li_11: 'Request correction of any incorrect information.',
+                privacy_li_12: 'Request the deletion of your data from our records (provided it does not conflict with our ongoing legal or contractual obligations).',
+                privacy_h6: '6. Cookies',
+                privacy_text_7: 'Our website may use cookies to enhance your experience and remember your preferences. You can disable cookies through your browser settings, though this may affect the functionality of some parts of the site.',
+                privacy_h7: '7. Contact Us',
+                privacy_text_8: 'If you have any questions regarding this Privacy Policy, please contact us via: Email: info@truedraft.com.sa - Phone: 0582226234',
+
+                [cite_start]// Terms and Conditions (English) [cite: 37-60]
+                terms_intro: 'Introduction:',
+                terms_text_1: 'Welcome to the True Draft General Contracting website. Please read these Terms and Conditions carefully before using our website or requesting any of our services. By accessing or using this website, you agree to be bound by these terms. If you do not agree with any part of these terms, please discontinue use immediately.',
+                terms_h1: '1. Definitions',
+                terms_li_1: '"Company", "We", or "Us": Refers to True Draft General Contracting.',
+                terms_li_2: '"Client" or "You": Refers to any individual or entity visiting the website or requesting our services.',
+                terms_li_3: '"Services": Includes architectural and interior design, construction execution, engineering supervision, and any other consulting services we offer.',
+                terms_h2: '2. Scope of Services and Contracting',
+                terms_li_4: 'The information and images displayed on this website are for the purpose of showcasing our portfolio and services.',
+                terms_li_5: 'Requesting a "Quote" via the website does not constitute a binding contract to commence work.',
+                terms_li_6: 'The actual commencement of any project (design or construction) is subject to a separate, written official contract signed by both parties. This contract outlines obligations, payments, timeline, and technical specifications, and serves as the sole legal reference.',
+                terms_h3: '3. Intellectual Property',
+                terms_li_7: 'All content on this website (including text, engineering designs, blueprints, logos, 3D renders, and photos of executed projects) is the exclusive property of True Draft and is protected by Intellectual Property laws in the Kingdom of Saudi Arabia.',
+                terms_li_8: 'It is strictly prohibited to copy, reproduce, or use any of our designs for commercial or personal purposes without express written permission from the Company management.',
+                terms_h4: '4. Pricing and Payments',
+                terms_li_9: 'Estimated prices (if shown on the website) are subject to change based on market material costs and specific project requirements.',
+                terms_li_10: 'The Client is obligated to settle financial dues according to the payment schedule agreed upon in the formal written contract.',
+                terms_h5: '5. Client Responsibilities',
+                terms_li_11: 'You are responsible for the accuracy of the data and information you provide to us (e.g., land area, title deeds, government permits).',
+                terms_li_12: 'The Company disclaims responsibility for any delays or fines resulting from incorrect documentation provided by the Client or failure to obtain necessary permits, unless the contract explicitly states that we are responsible for such tasks.',
+                terms_h6: '6. Disclaimer',
+                terms_text_2: 'We strive to ensure the accuracy of the information on our website; however, we do not guarantee that the site is free from typographical or technical errors. Your use of the website is at your own risk.',
+                terms_h7: '7. Governing Law',
+                terms_text_3: 'These Terms and Conditions are governed by the laws and regulations of the Kingdom of Saudi Arabia. In the event of any dispute, the competent courts in the city of Riyadh shall have jurisdiction.',
+                terms_h8: '8. Amendments',
+                terms_text_4: 'True Draft reserves the right to amend these terms at any time. Your continued use of the website after any changes constitutes your acceptance of the new terms.'
+            }
+        };
 
         function applyLanguage() {
             document.documentElement.lang = currentLang;
@@ -317,8 +451,7 @@
         window.toggleLanguage = toggleLanguage;
 
         document.addEventListener('DOMContentLoaded', () => { 
-            // loadSharedComponents(); // Removed
-            applyLanguage(); // Added to ensure language is applied on load
+            applyLanguage(); 
             initSlider(); 
         });
     </script>
