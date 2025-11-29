@@ -38,79 +38,6 @@
     </div>
 </footer>
 
-<!-- ========================= MODALS (ALL) ========================= -->
-
-<!-- Careers Modal -->
-<div id="careers-modal" class="hidden fixed inset-0 z-[5000] bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in">
-    <div class="min-h-screen flex items-center justify-center p-6">
-        <div class="w-full max-w-2xl bg-white border border-gray-200 shadow-2xl relative p-8 md:p-12 rounded-xl">
-            <button onclick="closeModal('careers-modal')" class="absolute top-6 left-6 rtl:left-6 rtl:right-auto p-2 border rounded-full hover:bg-black hover:text-white transition-colors ltr:left-auto ltr:right-6">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <h2 class="text-3xl font-bold mb-2 text-center" data-i18n="careers_title">انضم إلى فريقنا</h2>
-            <p class="text-center text-gray-500 mb-8 text-sm" data-i18n="careers_subtitle">املأ النموذج أدناه وسيتم إرسال طلبك مباشرة إلى فريق الموارد البشرية.</p>
-            <form onsubmit="submitCareerForm(event)" class="space-y-5">
-                <div>
-                    <label class="block text-xs font-bold uppercase mb-2 tracking-wider" data-i18n="form_name">الاسم الكامل</label>
-                    <input type="text" id="career-name" required class="w-full p-3 bg-gray-50 border border-gray-200 focus:border-black outline-none rounded-md">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase mb-2 tracking-wider" data-i18n="form_phone">رقم الجوال</label>
-                        <input type="tel" id="career-phone" required class="w-full p-3 bg-gray-50 border border-gray-200 focus:border-black outline-none rounded-md" dir="ltr">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase mb-2 tracking-wider" data-i18n="form_email">البريد الإلكتروني</label>
-                        <input type="email" id="career-email" required class="w-full p-3 bg-gray-50 border border-gray-200 focus:border-black outline-none rounded-md" dir="ltr">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase mb-2 tracking-wider" data-i18n="form_position">المسمى الوظيفي</label>
-                    <select id="career-position" required class="w-full p-3 bg-gray-50 border border-gray-200 focus:border-black outline-none rounded-md">
-                        <option value="" disabled selected data-i18n="select_position">اختر التخصص...</option>
-                        <option value="Architect">مهندس معماري (Architect)</option>
-                        <option value="Interior Designer">مصمم داخلي (Interior Designer)</option>
-                        <option value="Civil Engineer">مهندس مدني (Civil Engineer)</option>
-                        <option value="Project Manager">مدير مشاريع (Project Manager)</option>
-                        <option value="Site Engineer">مهندس موقع (Site Engineer)</option>
-                        <option value="Administrative">إداري / سكرتارية (Admin)</option>
-                    </select>
-                </div>
-                <button type="submit" class="w-full bg-black text-white font-bold py-4 hover:opacity-80 transition-opacity uppercase tracking-widest mt-4 rounded-md" data-i18n="form_send_app">إرسال الطلب</button>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Contact Modal -->
-<div id="contact-modal" class="hidden fixed inset-0 z-[5000] bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in">
-    <div class="min-h-screen flex items-center justify-center p-6">
-        <div class="w-full max-w-4xl bg-white border border-gray-200 shadow-2xl relative p-10 md:p-16 rounded-xl">
-            <button onclick="closeModal('contact-modal')" class="absolute top-6 left-6 rtl:left-6 rtl:right-auto p-2 border rounded-full hover:bg-black hover:text-white transition-colors ltr:left-auto ltr:right-6">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <div class="grid md:grid-cols-2 gap-12">
-                <div class="flex flex-col justify-center bg-black text-white p-8 rounded-xl">
-                    <h2 class="text-3xl font-bold mb-8" data-i18n="contact_header">تواصل معنا</h2>
-                    <div class="space-y-6">
-                        <div><h4 class="text-xs uppercase tracking-widest opacity-70 mb-1" data-i18n="phone_label">الهاتف</h4><a href="tel:0582226234" class="text-xl font-english font-light hover:underline" dir="ltr">058 222 6234</a></div>
-                        <div><h4 class="text-xs uppercase tracking-widest opacity-70 mb-1" data-i18n="email_label">البريد الإلكتروني</h4><a href="mailto:info@truedraft.com.sa" class="text-lg font-english font-light hover:underline">info@truedraft.com.sa</a></div>
-                        <div><h4 class="text-xs uppercase tracking-widest opacity-70 mb-1" data-i18n="location_label">الموقع</h4><p class="text-lg font-light" data-i18n="location_val">الرياض، المملكة العربية السعودية</p></div>
-                    </div>
-                </div>
-                <div>
-                    <form onsubmit="submitContactForm(event)" class="space-y-6">
-                        <div><label class="block text-sm font-bold mb-2 uppercase" data-i18n="form_name">الاسم</label><input type="text" id="contact-name" class="w-full p-4 bg-gray-50 border-b-2 border-transparent focus:border-black outline-none rounded-sm"></div>
-                        <div><label class="block text-sm font-bold mb-2 uppercase" data-i18n="form_email">البريد الإلكتروني</label><input type="email" id="contact-email" class="w-full p-4 bg-gray-50 border-b-2 border-transparent focus:border-black outline-none rounded-sm"></div>
-                        <div><label class="block text-sm font-bold mb-2 uppercase" data-i18n="form_message">الرسالة</label><textarea id="contact-message" class="w-full p-4 bg-gray-50 border-b-2 border-transparent focus:border-black outline-none h-32 rounded-sm"></textarea></div>
-                        <button type="submit" class="w-full bg-black text-white font-bold py-4 hover:opacity-80 transition-opacity uppercase tracking-widest rounded-md" data-i18n="form_send">إرسال</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Privacy Policy Modal -->
 <div id="privacy-modal" class="hidden fixed inset-0 z-[5000] bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in">
     <div class="min-h-screen flex items-center justify-center p-6">
@@ -120,44 +47,88 @@
             </button>
             <h2 class="text-3xl font-bold mb-8 sticky top-0 bg-white pb-4" data-i18n="privacy">سياسة الخصوصية</h2>
             <div class="prose max-w-none text-sm leading-relaxed text-gray-600 space-y-6">
-                <p class="font-bold" data-i18n="privacy_intro">مقدمة:</p>
-                <p data-i18n="privacy_text_1">في شركة ترو درفت (True Draft)، ندرك أن مشاريع البناء والتصاميم هي أمور شخصية وهامة جداً لعملائنا. نحن نلتزم بحماية خصوصيتك وبياناتك الشخصية والهندسية، وتوضح هذه السياسة كيفية جمعنا واستخدامنا لهذه المعلومات.</p>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h1">1. المعلومات التي نجمعها</h3>
-                <p data-i18n="privacy_text_2">عند استخدامك لموقعنا أو طلب خدمة، قد نطلب منك المعلومات التالية:</p>
-                <ul class="list-disc list-inside">
-                    <li data-i18n="privacy_li_1">بيانات الهوية: الاسم الكامل.</li>
-                    <li data-i18n="privacy_li_2">بيانات الاتصال: رقم الهاتف، البريد الإلكتروني، والعنوان.</li>
-                    <li data-i18n="privacy_li_3">بيانات المشروع: موقع الأرض، المساحة، صور الموقع، المخططات الهندسية السابقة، صور الصكوك أو التراخيص (لغرض الدراسة والتسعير).</li>
-                </ul>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h2">2. كيف نستخدم معلوماتك؟</h3>
-                <p data-i18n="privacy_text_3">نستخدم البيانات التي نجمعها للأغراض التالية فقط:</p>
-                <ul class="list-disc list-inside">
-                    <li data-i18n="privacy_li_4">دراسة طلبك وتقديم عروض أسعار دقيقة ومخصصة لمشروعك.</li>
-                    <li data-i18n="privacy_li_5">التواصل معك لتحديد مواعيد المعاينة أو مناقشة التصاميم.</li>
-                    <li data-i18n="privacy_li_6">إتمام إجراءات التعاقد واستخراج التراخيص (إذا كانت ضمن نطاق العمل).</li>
-                    <li data-i18n="privacy_li_7">تحسين خدماتنا وتجربة المستخدم على الموقع.</li>
-                </ul>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h3">3. مشاركة البيانات</h3>
-                <p data-i18n="privacy_text_4">نحن لا نقوم ببيع أو تأجير بياناتك الشخصية لأي طرف ثالث. ومع ذلك، قد نشارك بعض البيانات الضرورية في الحالات التالية فقط:</p>
-                <ul class="list-disc list-inside">
-                    <li data-i18n="privacy_li_8">شركاء التنفيذ: مثل الموردين أو المقاولين من الباطن لغرض حساب الكميات أو التوريد لمشروعك الخاص.</li>
-                    <li data-i18n="privacy_li_9">الجهات الحكومية: في حال طُلب منا ذلك بموجب القانون أو لاستخراج تراخيص البناء الخاصة بك.</li>
-                </ul>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h4">4. أمن البيانات</h3>
-                <p data-i18n="privacy_text_5">نتخذ كافة التدابير الأمنية التقنية والإدارية المناسبة لحماية بياناتك ومخططات منزلك من الوصول غير المصرح به، أو التغيير، أو الإفصاح.</p>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h5">5. حقوقك</h3>
-                <p data-i18n="privacy_text_6">يحق لك في أي وقت:</p>
-                <ul class="list-disc list-inside">
-                    <li data-i18n="privacy_li_10">الاستفسار عن البيانات التي نحتفظ بها عنك.</li>
-                    <li data-i18n="privacy_li_11">طلب تصحيح أي معلومات خاطئة.</li>
-                    <li data-i18n="privacy_li_12">طلب حذف بياناتك من سجلاتنا (بشرط ألا يتعارض ذلك مع التزاماتنا القانونية أو التعاقدية القائمة).</li>
-                </ul>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h6">6. ملفات تعريف الارتباط (Cookies)</h3>
-                <p data-i18n="privacy_text_7">قد يستخدم موقعنا ملفات تعريف الارتباط لتحسين تجربتك وتذكر تفضيلاتك. يمكنك تعطيلها من إعدادات المتصفح الخاص بك، ولكن قد يؤثر ذلك على عمل بعض أجزاء الموقع.</p>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="privacy_h7">7. اتصل بنا</h3>
-                <p data-i18n="privacy_text_8">إذا كان لديك أي استفسار حول سياسة الخصوصية، يسعدنا تواصلك معنا عبر:</p>
-                <p>info@truedraft.com.sa</p>
-                <p>058 222 6234</p>
+                <!-- Arabic Content -->
+                <div class="lang-ar">
+                    <p class="font-bold">مقدمة:</p>
+                    <p>في شركة ترو درفت (True Draft)، ندرك أن مشاريع البناء والتصاميم هي أمور شخصية وهامة جداً لعملائنا. نحن نلتزم بحماية خصوصيتك وبياناتك الشخصية والهندسية، وتوضح هذه السياسة كيفية جمعنا واستخدامنا لهذه المعلومات.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">1. المعلومات التي نجمعها</h3>
+                    <p>عند استخدامك لموقعنا أو طلب خدمة، قد نطلب منك المعلومات التالية:</p>
+                    <ul class="list-disc list-inside">
+                        <li>بيانات الهوية: الاسم الكامل.</li>
+                        <li>بيانات الاتصال: رقم الهاتف، البريد الإلكتروني، والعنوان.</li>
+                        <li>بيانات المشروع: موقع الأرض، المساحة، صور الموقع، المخططات الهندسية السابقة، صور الصكوك أو التراخيص (لغرض الدراسة والتسعير).</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">2. كيف نستخدم معلوماتك؟</h3>
+                    <p>نستخدم البيانات التي نجمعها للأغراض التالية فقط:</p>
+                    <ul class="list-disc list-inside">
+                        <li>دراسة طلبك وتقديم عروض أسعار دقيقة ومخصصة لمشروعك.</li>
+                        <li>التواصل معك لتحديد مواعيد المعاينة أو مناقشة التصاميم.</li>
+                        <li>إتمام إجراءات التعاقد واستخراج التراخيص (إذا كانت ضمن نطاق العمل).</li>
+                        <li>تحسين خدماتنا وتجربة المستخدم على الموقع.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">3. مشاركة البيانات</h3>
+                    <p>نحن لا نقوم ببيع أو تأجير بياناتك الشخصية لأي طرف ثالث. ومع ذلك، قد نشارك بعض البيانات الضرورية في الحالات التالية فقط:</p>
+                    <ul class="list-disc list-inside">
+                        <li>شركاء التنفيذ: مثل الموردين أو المقاولين من الباطن لغرض حساب الكميات أو التوريد لمشروعك الخاص.</li>
+                        <li>الجهات الحكومية: في حال طُلب منا ذلك بموجب القانون أو لاستخراج تراخيص البناء الخاصة بك.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">4. أمن البيانات</h3>
+                    <p>نتخذ كافة التدابير الأمنية التقنية والإدارية المناسبة لحماية بياناتك ومخططات منزلك من الوصول غير المصرح به، أو التغيير، أو الإفصاح.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">5. حقوقك</h3>
+                    <p>يحق لك في أي وقت:</p>
+                    <ul class="list-disc list-inside">
+                        <li>الاستفسار عن البيانات التي نحتفظ بها عنك.</li>
+                        <li>طلب تصحيح أي معلومات خاطئة.</li>
+                        <li>طلب حذف بياناتك من سجلاتنا (بشرط ألا يتعارض ذلك مع التزاماتنا القانونية أو التعاقدية القائمة).</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">6. ملفات تعريف الارتباط (Cookies)</h3>
+                    <p>قد يستخدم موقعنا ملفات تعريف الارتباط لتحسين تجربتك وتذكر تفضيلاتك. يمكنك تعطيلها من إعدادات المتصفح الخاص بك، ولكن قد يؤثر ذلك على عمل بعض أجزاء الموقع.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">7. اتصل بنا</h3>
+                    <p>إذا كان لديك أي استفسار حول سياسة الخصوصية، يسعدنا تواصلك معنا عبر:</p>
+                    <p>البريد الإلكتروني: info@truedraft.com.sa</p>
+                    <p>الهاتف: 058 222 6234</p>
+                </div>
+                <!-- English Content -->
+                <div class="lang-en hidden">
+                    <p class="font-bold">Introduction:</p>
+                    <p>At True Draft, we understand that construction projects and home designs are highly personal and significant to our clients. We are committed to protecting your privacy and your personal and engineering data. This policy outlines how we collect, use, and protect this information.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">1. Information We Collect</h3>
+                    <p>When you use our website or request a service, we may collect the following information:</p>
+                    <ul class="list-disc list-inside">
+                        <li>Identity Data: Full name.</li>
+                        <li>Contact Data: Phone number, email address, and location.</li>
+                        <li>Project Data: Land location, area size, site photos, previous engineering plans, and copies of title deeds or permits (for study and pricing purposes).</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">2. How We Use Your Information</h3>
+                    <p>We use the data we collect solely for the following purposes:</p>
+                    <ul class="list-disc list-inside">
+                        <li>Analyzing your request to provide accurate, customized quotes for your project.</li>
+                        <li>Contacting you to schedule site visits or discuss designs.</li>
+                        <li>Completing contracting procedures and obtaining permits (if within the scope of work).</li>
+                        <li>Improving our services and user experience on the website.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">3. Data Sharing</h3>
+                    <p>We do not sell or rent your personal data to any third parties. However, we may share necessary data in the following cases only:</p>
+                    <ul class="list-disc list-inside">
+                        <li>Execution Partners: Such as suppliers or subcontractors, strictly for the purpose of quantity surveying or material supply for your specific project.</li>
+                        <li>Government Authorities: If required by law or to process your building permits.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">4. Data Security</h3>
+                    <p>We implement appropriate technical and administrative security measures to protect your data and home blueprints from unauthorized access, alteration, or disclosure.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">5. Your Rights</h3>
+                    <p>You have the right at any time to:</p>
+                    <ul class="list-disc list-inside">
+                        <li>Inquire about the data we hold about you.</li>
+                        <li>Request correction of any incorrect information.</li>
+                        <li>Request the deletion of your data from our records (provided it does not conflict with our ongoing legal or contractual obligations).</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">6. Cookies</h3>
+                    <p>Our website may use cookies to enhance your experience and remember your preferences. You can disable cookies through your browser settings, though this may affect the functionality of some parts of the site.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">7. Contact Us</h3>
+                    <p>If you have any questions regarding this Privacy Policy, please contact us via:</p>
+                    <p>Email: info@truedraft.com.sa</p>
+                    <p>Phone: 058 222 6234</p>
+                </div>
             </div>
         </div>
     </div>
@@ -172,48 +143,101 @@
             </button>
             <h2 class="text-3xl font-bold mb-8 sticky top-0 bg-white pb-4" data-i18n="terms">الشروط والأحكام</h2>
             <div class="prose max-w-none text-sm leading-relaxed text-gray-600 space-y-6">
-                <p class="font-bold" data-i18n="terms_intro">مقدمة:</p>
-                <p data-i18n="terms_text_1">أهلاً بكم في موقع شركة ترو درفت (True Draft) للمقاولات العامة. يرجى قراءة هذه الشروط والأحكام بعناية قبل استخدام الموقع أو طلب أي من خدماتنا. بمجرد استخدامك لهذا الموقع، فإنك تقر بموافقتك الكاملة على هذه الشروط. إذا كنت لا توافق على أي جزء منها، يرجى التوقف عن استخدام الموقع فوراً.</p>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h1">1. التعريفات</h3>
-                <ul class="list-disc list-inside">
-                    <li data-i18n="terms_li_1">"الشركة" أو "نحن": يقصد بها شركة ترو درفت (True Draft) للمقاولات العامة.</li>
-                    <li data-i18n="terms_li_2">"العميل" أو "أنت": يقصد به أي فرد أو جهة اعتبارية تقوم بزيارة الموقع أو طلب خدماتنا.</li>
-                    <li data-i18n="terms_li_3">"الخدمات": تشمل التصميم المعماري والداخلي، التنفيذ، الإشراف، وأي خدمات هندسية أو استشارية أخرى نعرضها.</li>
-                </ul>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h2">2. طبيعة الخدمات والتعاقد</h3>
-                <ul class="list-disc list-inside">
-                    <li data-i18n="terms_li_4">إن المعلومات والصور المعروضة على هذا الموقع هي لغرض التعريف بخدماتنا وعرض سابقة أعمالنا.</li>
-                    <li data-i18n="terms_li_5">طلب "عرض سعر" عبر الموقع لا يعتبر عقداً ملزماً للشركة بالبدء في التنفيذ.</li>
-                    <li data-i18n="terms_li_6">يخضع البدء الفعلي لأي مشروع (تصميم أو مقاولات) لتوقيع عقد رسمي منفصل ومكتوب يحدد التزامات الطرفين، الدفعات، الجدول الزمني، والمواصفات الفنية، وهو المرجع القانوني الوحيد بين الطرفين.</li>
-                </ul>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h3">3. حقوق الملكية الفكرية</h3>
-                <ul class="list-disc list-inside">
-                    <li data-i18n="terms_li_7">جميع المحتويات الموجودة على هذا الموقع (بما في ذلك النصوص، التصاميم الهندسية، المخططات، الشعارات، صور المشاريع المنفذة، والرسومات ثلاثية الأبعاد) هي ملكية حصرية لشركة "ترو درفت" ومحمية بموجب أنظمة الملكية الفكرية في المملكة العربية السعودية.</li>
-                    <li data-i18n="terms_li_8">يمنع منعاً باتاً نسخ، إعادة إنتاج، أو استخدام أي من تصاميمنا لأغراض تجارية أو شخصية دون إذن كتابي صريح من إدارة الشركة.</li>
-                </ul>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h4">4. الأسعار والدفعات</h3>
-                <ul class="list-disc list-inside">
-                    <li data-i18n="terms_li_9">الأسعار التقديرية (إن وجدت على الموقع) قابلة للتغيير بناءً على أسعار مواد البناء في السوق ومواصفات المشروع الدقيقة.</li>
-                    <li data-i18n="terms_li_10">يلتزم العميل بدفع المستحقات المالية وفقاً للدفعات المتفق عليها في العقد الرسمي المبرم لاحقاً.</li>
-                </ul>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h5">5. مسؤولية العميل</h3>
-                <ul class="list-disc list-inside">
-                    <li data-i18n="terms_li_11">أنت مسؤول عن صحة البيانات والمعلومات التي تقدمها لنا (مثل مساحة الأرض، الصكوك، التراخيص الحكومية).</li>
-                    <li data-i18n="terms_li_12">تخلي الشركة مسؤوليتها عن أي تأخير أو غرامات ناتجة عن عدم صحة أوراق العميل أو عدم استخراجه للتراخيص اللازمة ما لم ينص العقد على تولينا هذه المهمة.</li>
-                </ul>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h6">6. إخلاء المسؤولية</h3>
-                <p data-i18n="terms_text_2">نسعى جاهدين لضمان دقة المعلومات على موقعنا، لكننا لا نقدم أي ضمانات بأن الموقع سيكون خالياً من الأخطاء المطبعية أو التقنية. استخدامك للموقع يكون على مسؤوليتك الخاصة.</p>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h7">7. القانون الواجب التطبيق</h3>
-                <p data-i18n="terms_text_3">تخضع هذه الشروط والأحكام للأنظمة واللوائح المعمول بها في المملكة العربية السعودية. في حال نشوء أي نزاع، يتم اللجوء إلى الجهات القضائية المختصة في مدينة الرياض.</p>
-                <h3 class="text-lg font-bold text-black mt-6 mb-2" data-i18n="terms_h8">8. التعديلات</h3>
-                <p data-i18n="terms_text_4">تحتفظ "ترو درفت" بالحق في تعديل هذه الشروط في أي وقت. يعتبر استمرارك في استخدام الموقع بعد التعديلات موافقة ضمنية عليها.</p>
+                <!-- Arabic Content -->
+                <div class="lang-ar">
+                    <p class="font-bold">مقدمة:</p>
+                    <p>أهلاً بكم في موقع شركة ترو درفت (True Draft) للمقاولات العامة. يرجى قراءة هذه الشروط والأحكام بعناية قبل استخدام الموقع أو طلب أي من خدماتنا. بمجرد استخدامك لهذا الموقع، فإنك تقر بموافقتك الكاملة على هذه الشروط. إذا كنت لا توافق على أي جزء منها، يرجى التوقف عن استخدام الموقع فوراً.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">1. التعريفات</h3>
+                    <ul class="list-disc list-inside">
+                        <li>"الشركة" أو "نحن": يقصد بها شركة ترو درفت (True Draft) للمقاولات العامة.</li>
+                        <li>"العميل" أو "أنت": يقصد به أي فرد أو جهة اعتبارية تقوم بزيارة الموقع أو طلب خدماتنا.</li>
+                        <li>"الخدمات": تشمل التصميم المعماري والداخلي، التنفيذ، الإشراف، وأي خدمات هندسية أو استشارية أخرى نعرضها.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">2. طبيعة الخدمات والتعاقد</h3>
+                    <ul class="list-disc list-inside">
+                        <li>إن المعلومات والصور المعروضة على هذا الموقع هي لغرض التعريف بخدماتنا وعرض سابقة أعمالنا.</li>
+                        <li>طلب "عرض سعر" عبر الموقع لا يعتبر عقداً ملزماً للشركة بالبدء في التنفيذ.</li>
+                        <li>يخضع البدء الفعلي لأي مشروع (تصميم أو مقاولات) لتوقيع عقد رسمي منفصل ومكتوب يحدد التزامات الطرفين، الدفعات، الجدول الزمني، والمواصفات الفنية، وهو المرجع القانوني الوحيد بين الطرفين.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">3. حقوق الملكية الفكرية</h3>
+                    <ul class="list-disc list-inside">
+                        <li>جميع المحتويات الموجودة على هذا الموقع (بما في ذلك النصوص، التصاميم الهندسية، المخططات، الشعارات، صور المشاريع المنفذة، والرسومات ثلاثية الأبعاد) هي ملكية حصرية لشركة "ترو درفت" ومحمية بموجب أنظمة الملكية الفكرية في المملكة العربية السعودية.</li>
+                        <li>يمنع منعاً باتاً نسخ، إعادة إنتاج، أو استخدام أي من تصاميمنا لأغراض تجارية أو شخصية دون إذن كتابي صريح من إدارة الشركة.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">4. الأسعار والدفعات</h3>
+                    <ul class="list-disc list-inside">
+                        <li>الأسعار التقديرية (إن وجدت على الموقع) قابلة للتغيير بناءً على أسعار مواد البناء في السوق ومواصفات المشروع الدقيقة.</li>
+                        <li>يلتزم العميل بدفع المستحقات المالية وفقاً للدفعات المتفق عليها في العقد الرسمي المبرم لاحقاً.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">5. مسؤولية العميل</h3>
+                    <ul class="list-disc list-inside">
+                        <li>أنت مسؤول عن صحة البيانات والمعلومات التي تقدمها لنا (مثل مساحة الأرض، الصكوك، التراخيص الحكومية).</li>
+                        <li>تخلي الشركة مسؤوليتها عن أي تأخير أو غرامات ناتجة عن عدم صحة أوراق العميل أو عدم استخراجه للتراخيص اللازمة ما لم ينص العقد على تولينا هذه المهمة.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">6. إخلاء المسؤولية</h3>
+                    <p>نسعى جاهدين لضمان دقة المعلومات على موقعنا، لكننا لا نقدم أي ضمانات بأن الموقع سيكون خالياً من الأخطاء المطبعية أو التقنية. استخدامك للموقع يكون على مسؤوليتك الخاصة.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">7. القانون الواجب التطبيق</h3>
+                    <p>تخضع هذه الشروط والأحكام للأنظمة واللوائح المعمول بها في المملكة العربية السعودية. في حال نشوء أي نزاع، يتم اللجوء إلى الجهات القضائية المختصة في مدينة الرياض.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">8. التعديلات</h3>
+                    <p>تحتفظ "ترو درفت" بالحق في تعديل هذه الشروط في أي وقت. يعتبر استمرارك في استخدام الموقع بعد التعديلات موافقة ضمنية عليها.</p>
+                </div>
+                <!-- English Content -->
+                <div class="lang-en hidden">
+                    <p class="font-bold">Introduction:</p>
+                    <p>Welcome to the True Draft General Contracting website. Please read these Terms and Conditions carefully before using our website or requesting any of our services. By accessing or using this website, you agree to be bound by these terms. If you do not agree with any part of these terms, please discontinue use immediately.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">1. Definitions</h3>
+                    <ul class="list-disc list-inside">
+                        <li>"Company", "We", or "Us": Refers to True Draft General Contracting.</li>
+                        <li>"Client" or "You": Refers to any individual or entity visiting the website or requesting our services.</li>
+                        <li>"Services": Includes architectural and interior design, construction execution, engineering supervision, and any other consulting services we offer.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">2. Scope of Services and Contracting</h3>
+                    <ul class="list-disc list-inside">
+                        <li>The information and images displayed on this website are for the purpose of showcasing our portfolio and services.</li>
+                        <li>Requesting a "Quote" via the website does not constitute a binding contract to commence work.</li>
+                        <li>The actual commencement of any project (design or construction) is subject to a separate, written official contract signed by both parties. This contract outlines obligations, payments, timeline, and technical specifications, and serves as the sole legal reference.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">3. Intellectual Property</h3>
+                    <ul class="list-disc list-inside">
+                        <li>All content on this website (including text, engineering designs, blueprints, logos, 3D renders, and photos of executed projects) is the exclusive property of True Draft and is protected by Intellectual Property laws in the Kingdom of Saudi Arabia.</li>
+                        <li>It is strictly prohibited to copy, reproduce, or use any of our designs for commercial or personal purposes without express written permission from the Company management.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">4. Pricing and Payments</h3>
+                    <ul class="list-disc list-inside">
+                        <li>Estimated prices (if shown on the website) are subject to change based on market material costs and specific project requirements.</li>
+                        <li>The Client is obligated to settle financial dues according to the payment schedule agreed upon in the formal written contract.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">5. Client Responsibilities</h3>
+                    <ul class="list-disc list-inside">
+                        <li>You are responsible for the accuracy of the data and information you provide to us (e.g., land area, title deeds, government permits).</li>
+                        <li>The Company disclaims responsibility for any delays or fines resulting from incorrect documentation provided by the Client or failure to obtain necessary permits, unless the contract explicitly states that we are responsible for such tasks.</li>
+                    </ul>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">6. Disclaimer</h3>
+                    <p>We strive to ensure the accuracy of the information on our website; however, we do not guarantee that the site is free from typographical or technical errors. Your use of the website is at your own risk.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">7. Governing Law</h3>
+                    <p>These Terms and Conditions are governed by the laws and regulations of the Kingdom of Saudi Arabia. In the event of any dispute, the competent courts in the city of Riyadh shall have jurisdiction.</p>
+                    <h3 class="text-lg font-bold text-black mt-6 mb-2">8. Amendments</h3>
+                    <p>True Draft reserves the right to amend these terms at any time. Your continued use of the website after any changes constitutes your acceptance of the new terms.</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-# Updated files:
-
-## footer.html
-
-Full Update: Contains footer content + ALL Modals (Careers, Contact, Privacy, Terms) to ensure they work on every page.
+<script>
+    function updateLegalLang() {
+        const lang = localStorage.getItem('lang') || 'ar';
+        if (lang === 'ar') {
+            document.querySelectorAll('.lang-ar').forEach(el => el.classList.remove('hidden'));
+            document.querySelectorAll('.lang-en').forEach(el => el.classList.add('hidden'));
+        } else {
+            document.querySelectorAll('.lang-ar').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.lang-en').forEach(el => el.classList.remove('hidden'));
+        }
+    }
+    // Call on load and whenever language toggles
+    updateLegalLang();
+    // Hook into global toggleLanguage if needed, or use MutationObserver on body lang
+    const observer = new MutationObserver(updateLegalLang);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+</script>
