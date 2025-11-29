@@ -28,7 +28,7 @@
 
     <div id="footer-placeholder"></div>
 
-    <!-- Blog Detail Modal -->
+    <!-- Blog Detail Modal (Specific to this page) -->
     <div id="blog-detail-view" class="hidden fixed inset-0 z-[2050] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl overflow-y-auto relative">
             <button onclick="closeBlogDetail()" class="sticky top-4 left-4 z-50 bg-white rounded-full p-2 shadow"><svg width="24" height="24" fill="none" stroke="black" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
@@ -37,38 +37,14 @@
         </div>
     </div>
 
+    <script src="js/main.js"></script>
     <script>
+        // Page Specific Logic
         const posts = [
             { id: 1, title: 'دليل حساب تكلفة تشطيب فيلا 2025', category: 'مقاولات', date: '15 JAN 2025', image: 'images/blog1.jpg', content: '<p>تفاصيل المقال...</p>' },
             { id: 2, title: 'الفرق بين المودرن والنيو كلاسيك', category: 'تصميم', date: '10 JAN 2025', image: 'images/blog2.jpg', content: '<p>تفاصيل المقال...</p>' },
             { id: 3, title: 'أخطاء كارثية عند اختيار المقاول', category: 'نصائح', date: '05 JAN 2025', image: 'images/blog3.jpg', content: '<p>تفاصيل المقال...</p>' }
         ];
-
-        let currentLang = localStorage.getItem('lang') || 'ar';
-        const translations = {
-            ar: { blog_title: 'المدونة', home: 'الرئيسية', about: 'عن ترو درفت', projects: 'مشاريعنا', blog: 'المدونة', contact: 'تواصل معنا', careers: 'التوظيف', contact_header: 'تواصل معنا', email_label: 'البريد الإلكتروني', phone_label: 'اتصل بنا', location_label: 'الموقع', location_val: 'الرياض، المملكة العربية السعودية', rights: 'جميع الحقوق محفوظة لشركة True Draft © 2025', privacy: 'سياسة الخصوصية', terms: 'الشروط والأحكام', careers_title: 'انضم إلى فريقنا', careers_subtitle: 'املأ النموذج أدناه...', form_name: 'الاسم', form_phone: 'رقم الجوال', form_email: 'البريد الإلكتروني', form_position: 'المسمى الوظيفي', form_message: 'الرسالة', form_send: 'إرسال', form_send_app: 'إرسال الطلب', select_position: 'اختر التخصص...', privacy_intro: 'مقدمة:', privacy_text_1: '...', terms_intro: 'مقدمة:', terms_text_1: '...' },
-            en: { blog_title: 'Blog', home: 'Home', about: 'About Us', projects: 'Projects', blog: 'Blog', contact: 'Contact', careers: 'Careers', contact_header: 'Get in Touch', email_label: 'Email', phone_label: 'Call Us', location_label: 'Location', location_val: 'Riyadh, Saudi Arabia', rights: 'All rights reserved True Draft © 2025', privacy: 'Privacy Policy', terms: 'Terms & Conditions', careers_title: 'Join Our Team', careers_subtitle: 'Fill the form below...', form_name: 'Name', form_phone: 'Mobile', form_email: 'Email', form_position: 'Position', form_message: 'Message', form_send: 'Send', form_send_app: 'Submit Application', select_position: 'Select Position...', privacy_intro: 'Introduction:', privacy_text_1: '...', terms_intro: 'Introduction:', terms_text_1: '...' }
-        };
-
-        async function loadSharedComponents() {
-            try {
-                const headerRes = await fetch('header.html');
-                document.getElementById('header-placeholder').innerHTML = await headerRes.text();
-                const footerRes = await fetch('footer.html');
-                document.getElementById('footer-placeholder').innerHTML = await footerRes.text();
-                applyLanguage();
-            } catch (e) { console.error(e); }
-        }
-
-        function applyLanguage() {
-            document.documentElement.lang = currentLang;
-            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-            document.body.style.fontFamily = currentLang === 'ar' ? "'Cairo', sans-serif" : "'Manrope', sans-serif";
-            const btnText = document.getElementById('lang-btn-text');
-            if(btnText) btnText.textContent = currentLang === 'ar' ? 'EN' : 'عربي';
-            document.querySelectorAll('[data-i18n]').forEach(el => { const k=el.getAttribute('data-i18n'); if(translations[currentLang][k]) el.textContent=translations[currentLang][k]; });
-        }
-        function toggleLanguage() { currentLang = currentLang === 'ar' ? 'en' : 'ar'; localStorage.setItem('lang', currentLang); applyLanguage(); }
 
         function render() {
             const grid = document.getElementById('blog-grid');
@@ -93,15 +69,7 @@
         }
         function closeBlogDetail() { document.getElementById('blog-detail-view').classList.add('hidden'); }
 
-        // Shared Globals
-        window.openModal = (id) => { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; };
-        window.closeModal = (id) => { document.getElementById(id).classList.add('hidden'); document.body.style.overflow = 'auto'; };
-        window.toggleMenu = () => { const m=document.getElementById('mobile-menu'); m.classList.toggle('hidden'); m.classList.toggle('flex'); };
-        window.submitCareerForm = (e) => { e.preventDefault(); const n=document.getElementById('career-name').value; window.location.href=`mailto:hr@truedraft.com.sa?subject=Job Application: ${n}`; };
-        window.submitContactForm = (e) => { e.preventDefault(); const n=document.getElementById('contact-name').value; window.location.href=`mailto:info@truedraft.com.sa?subject=Contact: ${n}`; };
-        window.toggleLanguage = toggleLanguage;
-
-        document.addEventListener('DOMContentLoaded', () => { loadSharedComponents(); render(); });
+        document.addEventListener('DOMContentLoaded', render);
     </script>
 </body>
 </html>
