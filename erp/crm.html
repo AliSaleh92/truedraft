@@ -626,7 +626,8 @@
                 const interval = setInterval(() => {
                     if (window.firebaseReady) {
                         clearInterval(interval);
-                        document.getElementById('initial-loader')?.style.display = 'none';
+                        const loader = document.getElementById('initial-loader');
+                        if (loader) loader.style.display = 'none';
 
                         window.authListener(window.auth, (u) => {
                             if (u) {
