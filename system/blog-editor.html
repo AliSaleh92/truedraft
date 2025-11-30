@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; }
-        #initial-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f8fafc; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        #initial-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f8fafc; z-index: 9999; display: flex; flex-direction:column; align-items: center; justify-content: center; }
         .loader { border: 4px solid #e5e7eb; border-top: 4px solid #000; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .animate-fade-in { animation: fadeIn 0.3s ease-in-out; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -21,7 +21,10 @@
     </style>
 </head>
 <body>
-    <div id="initial-loader"><div class="loader"></div></div>
+    <div id="initial-loader">
+        <div class="loader"></div>
+        <p class="mt-4 font-bold text-gray-500">جاري التحقق من الصلاحيات...</p>
+    </div>
     <div id="root"></div>
 
     <script type="module">
@@ -62,8 +65,6 @@
 
         const Icon = ({ name, size = 16, className = "" }) => <i data-lucide={name} width={size} height={size} className={className}></i>;
         
-        const Login = () => { /* Same login component as erp.html can be used here if needed */ return <p>Redirecting to login...</p>; };
-
         const Header = ({ user }) => (
             <header className="bg-white h-16 border-b flex items-center justify-between px-6 shrink-0 z-10 sticky top-0">
                 <div className="flex items-center gap-4">
@@ -250,7 +251,6 @@
                     updates[`/blogPosts/${post.id}/order`] = index;
                 });
                 window.dbUpdate(window.dbRef(window.db), updates);
-                // No need to setPosts here as onValue listener will do it
             };
 
             const showEditor = (post = null) => {
@@ -263,7 +263,7 @@
                 setView('list');
             };
             
-            useEffect(() => { lucide.createIcons(); }, [view, posts, loading]);
+            useEffect(() => { if(lucide) lucide.createIcons(); });
 
             if (loading) return <div id="initial-loader"><div className="loader"></div></div>;
 
@@ -298,24 +298,42 @@
 
             useEffect(() => {
                 const initAuth = () => {
-                    document.getElementById('initial-loader').style.display = 'none';
-                    return window.authListener(window.auth, (u) => {
+                    window.authListener(window.auth, async (u) => {
                         if (u) {
-                            // For simplicity, assuming any logged in user can edit blog for now.
-                            // In a real app, you'd fetch user roles from DB.
-                            setUser({ name: u.email.split('@')[0], email: u.email });
+                            let currentUser = null;
+                            let authorized = false;
+                            
+                            if (u.email === "al2we09@gmail.com") {
+                                currentUser = { id: 'admin', name: 'Ali Saleh', email: u.email, role: 'admin' };
+                                authorized = true;
+                            } else {
+                                const userRef = window.dbRef(window.db, `users/${u.uid}`);
+                                const snapshot = await window.dbGet(userRef);
+                                if (snapshot.exists()) {
+                                    currentUser = { id: u.uid, ...snapshot.val() };
+                                    if (currentUser.permissions && currentUser.permissions.blog === 'supervisor') {
+                                        authorized = true;
+                                    }
+                                }
+                            }
+
+                            if (currentUser && authorized) {
+                                setUser(currentUser);
+                                setLoading(false);
+                                document.getElementById('initial-loader').style.display = 'none';
+                            } else {
+                                alert('ليس لديك الصلاحية للوصول لهذه الصفحة.');
+                                window.location.href = 'erp.html';
+                            }
                         } else {
-                            // Redirect to main ERP login if not authenticated
                             window.location.href = 'erp.html';
                         }
-                        setLoading(false);
                     });
                 };
-                 document.addEventListener('firebaseReady', initAuth, { once: true });
+                document.addEventListener('firebaseReady', initAuth, { once: true });
             }, []);
 
-            if (loading) return null;
-            if (!user) return <Login />;
+            if (loading || !user) return null;
 
             return <BlogManager user={user} />;
         };
