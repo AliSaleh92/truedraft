@@ -281,7 +281,8 @@
 
             useEffect(() => {
                 const initAuth = () => {
-                    document.getElementById('initial-loader')?.style.display = 'none';
+                    const loader = document.getElementById('initial-loader');
+                    if (loader) loader.style.display = 'none';
                     window.authListener(window.auth, (u) => {
                         if (u) {
                             window.dbOnValue(window.dbRef(window.db, 'users'), (snap) => {
