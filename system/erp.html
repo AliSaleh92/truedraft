@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; touch-action: manipulation; }
+        body { font-family: 'Cairo', sans-serif; background-color: #ffffff; touch-action: manipulation; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
@@ -24,7 +24,7 @@
         
         #initial-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #f8fafc; z-index: 9999; display: flex; flex-direction: column;
+            background: #ffffff; z-index: 9999; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
         }
         .loader { border: 4px solid #e5e7eb; border-top: 4px solid #000; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
@@ -87,7 +87,7 @@
         const Icons = {
             Users: "users-2", Briefcase: "briefcase", Clock: "clock", Grid: "layout-grid",
             LogOut: "log-out", UserCog: "user-cog", Plus: "plus", X: "x", ArrowLeft: "arrow-left",
-            Trash2: "trash-2", Edit: "edit", KeyRound: "key-round",
+            Trash2: "trash-2", Edit: "edit", KeyRound: "key-round", FileText: "file-text",
         };
 
         const Icon = ({ name, size = 20, className = "" }) => {
@@ -136,9 +136,7 @@
 
         const MODULES = [
             { key: 'crm', name: 'نظام CRM', icon: 'Grid' },
-            { key: 'attendance', name: 'نظام الحضور', icon: 'Clock' },
-            { key: 'projects', name: 'إدارة المشاريع', icon: 'Briefcase' },
-            { key: 'hr', name: 'الموارد البشرية', icon: 'Users' },
+            { key: 'blog', name: 'المدونة', icon: 'FileText' },
         ];
         const PERMISSIONS = [
             { key: 'supervisor', label: 'مشرف' },
@@ -283,38 +281,35 @@
         };
         
         const Dashboard = () => {
-            const Card = ({ title, desc, icon, href, color }) => (
-                <a href={href} className="bg-white p-6 rounded-2xl shadow-sm border text-right hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-start group">
-                    <div className={`p-3 rounded-xl inline-block mb-4 ${color}`}>
-                        <Icon name={icon} className="text-gray-800" size={24} />
+            const Card = ({ title, desc, icon, href }) => (
+                <a href={href} className="bg-white p-8 rounded-2xl shadow-sm border text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center group">
+                    <div className="p-4 rounded-xl inline-block mb-5 bg-gray-100 group-hover:bg-black transition-colors">
+                        <Icon name={icon} className="text-gray-800 group-hover:text-white transition-colors" size={32} />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-800">{title}</h3>
-                    <p className="text-gray-500 mt-1 text-sm flex-grow">{desc}</p>
+                    <h3 className="text-2xl font-bold text-gray-800">{title}</h3>
+                    <p className="text-gray-500 mt-2 text-sm flex-grow">{desc}</p>
                 </a>
             );
 
             return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
-                    <Card title="إدارة العملاء" desc="إدارة العمل والصفقات والتقارير" icon="Grid" href="crm.html" color="bg-blue-100" />
-                    <Card title="الحضور" desc="تسجيل الحضور اليومي وساعات العمل" icon="Clock" href="#" color="bg-yellow-100" />
-                    <Card title="المشاريع" desc="إدارة المشاريع والمهام والإنجاز" icon="Briefcase" href="#" color="bg-green-100" />
-                    <Card title="الموارد البشرية" desc="إدارة الموظفين، الرواتب والوثائق" icon="Users" href="#users" color="bg-pink-100" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 animate-fade-in max-w-4xl mx-auto mt-8">
+                    <Card title="إدارة العملاء" desc="نظام متكامل لإدارة العملاء، الصفقات، والملاحظات" icon="Grid" href="crm.html" />
+                    <Card title="المدونة" desc="إدارة وإنشاء مقالات للموقع العام" icon="FileText" href="../blog.html" />
                 </div>
             );
         };
 
         const Header = ({ user, route }) => {
             return (
-                <header className="bg-white h-20 border-b flex items-center justify-between px-6 shrink-0 shadow-sm z-10">
+                <header className="bg-white h-20 border-b flex items-center justify-between px-6 shrink-0 z-10">
                     <div className="flex items-center gap-4">
-                        {route !== '#home' && 
+                        {route !== '#home' ?
                             <a href="#home" className="text-gray-600 px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-100 transition">
                                 <Icon name="ArrowLeft" size={18} /> رجوع
                             </a>
-                        }
-                        {user.role === 'admin' &&
-                            <a href="#users" className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition ${route === '#users' ? 'bg-black text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}>
-                                <Icon name="UserCog" size={18} /> إدارة الموظفين
+                        :
+                            <a href="#home" className="block">
+                                <img src="../images/logo.png" alt="True Draft" className="h-10 object-contain"/>
                             </a>
                         }
                     </div>
@@ -330,8 +325,13 @@
                         <div className="bg-gray-800 text-white w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl shadow-inner">
                             TD
                         </div>
-                        <button onClick={() => window.authSignOut(window.auth)} className="bg-red-50 text-red-600 px-3 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-red-100 transition">
-                            <Icon name="LogOut" size={18} />
+                        {user.role === 'admin' &&
+                            <a href="#users" title="إدارة الموظفين" className={`p-3 rounded-lg font-bold flex items-center transition ${route === '#users' ? 'bg-black text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}>
+                                <Icon name="UserCog" size={20} />
+                            </a>
+                        }
+                        <button onClick={() => window.authSignOut(window.auth)} title="تسجيل الخروج" className="bg-gray-100 text-gray-800 p-3 rounded-lg font-bold flex items-center hover:bg-gray-200 transition">
+                            <Icon name="LogOut" size={20} />
                         </button>
                     </div>
                 </header>
