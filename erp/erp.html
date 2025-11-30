@@ -168,6 +168,9 @@
                 setLoading(true);
                 setErr('');
                 window.authSignIn(window.auth, email, pass)
+                    .then(() => {
+                        window.location.hash = '#home';
+                    })
                     .catch(() => {
                         setLoading(false);
                         setErr('خطأ في البريد أو كلمة المرور');
@@ -900,9 +903,9 @@
             );
         };
 
-        const HomeDashboard = ({ setPage, user }) => {
-            const Card = ({ title, desc, icon, page }) => (
-                <button onClick={() => setPage(page)} className="bg-white p-6 rounded-2xl shadow-sm border text-right hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-start justify-between group">
+        const HomeDashboard = ({ user }) => {
+            const Card = ({ title, desc, icon, href }) => (
+                <a href={href} className="bg-white p-6 rounded-2xl shadow-sm border text-right hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-start justify-between group">
                     <div>
                         <div className="bg-gray-100 p-3 rounded-xl inline-block mb-4">
                             <Icon name={icon} className="text-gray-700" size={24} />
@@ -914,7 +917,7 @@
                         <span>دخول للنظام</span>
                         <i data-lucide="arrow-left" width="16" height="16" className="transition-transform group-hover:translate-x-[-4px]"></i>
                     </div>
-                </button>
+                </a>
             );
 
             useEffect(() => { lucide.createIcons(); }, []);
@@ -926,12 +929,12 @@
                         <p className="text-gray-500 mt-1">اختر النظام الذي تريد الدخول إليه.</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <Card title="إدارة العملاء (CRM)" desc="عرض وإدارة جميع العملاء والمشاريع." icon="Users" page="clients" />
-                        <Card title="لوحة التحكم" desc="عرض الإحصائيات وتقارير الأداء." icon="PieChart" page="dashboard" />
+                        <Card title="إدارة العملاء (CRM)" desc="عرض وإدارة جميع العملاء والمشاريع." icon="Users" href="#clients" />
+                        <Card title="لوحة التحكم" desc="عرض الإحصائيات وتقارير الأداء." icon="PieChart" href="#dashboard" />
                         {user.role === 'admin' && (
                             <>
-                                <Card title="إدارة الموظفين" desc="إضافة وتعديل صلاحيات الموظفين." icon="Shield" page="users" />
-                                <Card title="إدارة المدونة" desc="كتابة ونشر وتعديل المقالات." icon="FileText" page="blog" />
+                                <Card title="إدارة الموظفين" desc="إضافة وتعديل صلاحيات الموظفين." icon="Shield" href="#users" />
+                                <Card title="إدارة المدونة" desc="كتابة ونشر وتعديل المقالات." icon="FileText" href="#blog" />
                             </>
                         )}
                     </div>
@@ -939,11 +942,11 @@
             );
         };
 
-        const Sidebar = ({ page, setPage, isOpen, setIsOpen, user }) => {
+        const Sidebar = ({ route, isOpen, setIsOpen, user }) => {
             const Link = ({ to, icon, label }) => (
-                <button onClick={() => { setPage(to); if(window.innerWidth < 768) setIsOpen(false); }} className={`flex items-center gap-3 w-full p-3 rounded-lg transition ${page === to ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
+                <a href={to} onClick={() => { if(window.innerWidth < 768) setIsOpen(false); }} className={`flex items-center gap-3 w-full p-3 rounded-lg transition ${route === to ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
                     <Icon name={icon} size={20} /> <span>{label}</span>
-                </button>
+                </a>
             );
             return (
                 <>
@@ -953,15 +956,15 @@
                             <img src="../images/logo.png" alt="True Draft" className="h-12 object-contain" />
                         </div>
                         <nav className="flex-1 p-4 space-y-2">
-                            <Link to="home" icon="LayoutDashboard" label="القائمة الرئيسية" />
-                            <Link to="clients" icon="Users" label="العملاء" />
-                            <Link to="dashboard" icon="PieChart" label="لوحة التحكم" />
+                            <Link to="#home" icon="LayoutDashboard" label="القائمة الرئيسية" />
+                            <Link to="#clients" icon="Users" label="العملاء" />
+                            <Link to="#dashboard" icon="PieChart" label="لوحة التحكم" />
                             {user.role === 'admin' && (
                                 <>
                                     <hr className="border-gray-700 my-2" />
                                     <div className="text-xs text-gray-500 font-bold uppercase px-3 pt-2">الإدارة</div>
-                                    <Link to="users" icon="Shield" label="إدارة الموظفين" />
-                                    <Link to="blog" icon="FileText" label="إدارة المدونة" />
+                                    <Link to="#users" icon="Shield" label="إدارة الموظفين" />
+                                    <Link to="#blog" icon="FileText" label="إدارة المدونة" />
                                 </>
                             )}
                         </nav>
@@ -973,11 +976,17 @@
         const App = () => {
             const [user, setUser] = useState(null);
             const [loading, setLoading] = useState(true);
-            const [page, setPage] = useState('home');
+            const [route, setRoute] = useState(window.location.hash || '#home');
             const [sidebarOpen, setSidebarOpen] = useState(false);
             
             const [clients, setClients] = useState([]);
             const [users, setUsers] = useState([]);
+
+            useEffect(() => {
+                const handleHashChange = () => setRoute(window.location.hash || '#home');
+                window.addEventListener('hashchange', handleHashChange);
+                return () => window.removeEventListener('hashchange', handleHashChange);
+            }, []);
 
             useEffect(() => {
                 const interval = setInterval(() => {
@@ -1020,6 +1029,8 @@
                             } else {
                                 setUser(null);
                                 setLoading(false);
+                                // If logged out, clear hash to prevent showing a protected page on reload
+                                if(window.location.hash) window.location.hash = '';
                             }
                         });
                     }
@@ -1028,13 +1039,24 @@
                 return () => clearInterval(interval);
             }, []);
 
+            const renderPage = () => {
+                switch(route) {
+                    case '#home': return <HomeDashboard user={user} />;
+                    case '#dashboard': return <Dashboard clients={clients} />;
+                    case '#clients': return <Clients clients={clients} users={users} user={user} />;
+                    case '#users': return user.role === 'admin' ? <Users users={users} /> : <p>Access Denied</p>;
+                    case '#blog': return user.role === 'admin' ? <Blog /> : <p>Access Denied</p>;
+                    default: return <HomeDashboard user={user} />;
+                }
+            };
+            
             if (loading) return <div className="h-screen flex items-center justify-center"></div>;
 
             if (!user) return <Login />;
 
             return (
                 <div className="flex min-h-screen" dir="rtl">
-                    <Sidebar page={page} setPage={setPage} isOpen={sidebarOpen} setIsOpen={setSidebarOpen} user={user} />
+                    <Sidebar route={route} isOpen={sidebarOpen} setIsOpen={setSidebarOpen} user={user} />
                     <div className="flex-1 flex flex-col min-w-0 overflow-hidden h-screen">
                         
                         <header className="bg-white h-20 border-b flex items-center justify-between px-6 shrink-0 shadow-sm z-20">
@@ -1060,11 +1082,7 @@
                         </header>
 
                         <main className="flex-1 overflow-y-auto p-6 md:p-8 bg-[#f3f4f6]">
-                            {page === 'home' && <HomeDashboard setPage={setPage} user={user} />}
-                            {page === 'dashboard' && <Dashboard clients={clients} />}
-                            {page === 'clients' && <Clients clients={clients} users={users} user={user} />}
-                            {page === 'users' && user.role === 'admin' && <Users users={users} />}
-                            {page === 'blog' && user.role === 'admin' && <Blog />}
+                            {renderPage()}
                         </main>
                     </div>
                 </div>
