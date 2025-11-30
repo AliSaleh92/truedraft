@@ -84,7 +84,7 @@
     </script>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo, useRef, useCallback } = React;
+        const { useState, useEffect, useMemo, useRef, useCallback, memo } = React;
         
         const playAssignSound = (assignedName) => {
             if (!assignedName) return;
@@ -120,9 +120,14 @@
             User: "user", Folder: "folder", Package: "package", Calendar: "calendar"
         };
 
-        const Icon = ({ name, size = 20, className = "" }) => {
+        const Icon = memo(({ name, size = 20, className = "" }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name, size, className]);
             return <i data-lucide={Icons[name]} width={size} height={size} className={className}></i>;
-        };
+        });
 
         const ADMIN_EMAIL = "al2we09@gmail.com";
         const PROJECT_TYPES = ["سكني", "تجاري"];
@@ -194,7 +199,7 @@
             );
         };
         
-        const Header = ({ user, onLogout }) => (
+        const Header = memo(({ user, onLogout }) => (
             <header className="bg-white h-20 border-b flex items-center justify-between px-6 shrink-0 shadow-sm z-10 sticky top-0">
                 <div className="flex items-center gap-4">
                     <a href="erp.html#home" className="text-gray-800 px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-100 transition">
@@ -215,9 +220,9 @@
                     </button>
                 </div>
             </header>
-        );
+        ));
 
-        const Dashboard = ({ clients, users, currentUser }) => {
+        const Dashboard = memo(({ clients, users, currentUser }) => {
             const stats = useMemo(() => {
                 const thirtyDaysAgo = new Date();
                 thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -268,7 +273,7 @@
                 }
             }, [clients, users, currentUser]);
 
-            const StatCard = ({ title, value, icon, color }) => (
+            const StatCard = memo(({ title, value, icon, color }) => (
                 <div className={`bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-5 ${value > 0 ? '' : 'opacity-60'}`}>
                     <div className={`p-4 rounded-xl ${color}`}>
                         <Icon name={icon} className="text-black" size={28} />
@@ -278,7 +283,7 @@
                         <p className="text-4xl font-extrabold text-black">{value}</p>
                     </div>
                 </div>
-            );
+            ));
 
             return (
                 <div className="space-y-8 animate-fade-in">
@@ -345,9 +350,9 @@
                     </div>
                 </div>
             );
-        };
+        });
 
-        const ClientList = ({ clients, users, user, onClientUpdate }) => {
+        const ClientList = memo(({ clients, users, user, onClientUpdate }) => {
             const [search, setSearch] = useState('');
             const [statusFilter, setStatusFilter] = useState('');
             const [assignFilter, setAssignFilter] = useState('');
@@ -513,7 +518,7 @@
                     {editingClient && <EditModal c={editingClient} onClose={()=>setEditId(null)} onUpdate={updateClient} onNote={addNote} onAddTask={addTask} onToggleTask={toggleTask} onDeleteTask={deleteTask} users={users} user={user} />}
                 </div>
             );
-        };
+        });
        
         const App = () => {
             const [user, setUser] = useState(null);
@@ -592,20 +597,22 @@
                 <div className="flex flex-col min-h-screen">
                     <Header user={user} onLogout={handleLogout} />
                     <main className="flex-1 p-6 md:p-8">
-                        <div className="mb-6 border-b">
+                         <div className="mb-6 border-b">
                             <nav className="flex gap-6 -mb-px">
                                 <button onClick={() => setActiveTab('dashboard')} className={`px-1 py-3 text-lg font-bold ${activeTab === 'dashboard' ? 'border-b-2 border-black text-black' : 'text-gray-500'}`}>لوحة التحكم</button>
                                 <button onClick={() => setActiveTab('clients')} className={`px-1 py-3 text-lg font-bold ${activeTab === 'clients' ? 'border-b-2 border-black text-black' : 'text-gray-500'}`}>إدارة العملاء</button>
                             </nav>
                         </div>
-                        {activeTab === 'dashboard' && <Dashboard clients={clients} users={users} currentUser={user} />}
-                        {activeTab === 'clients' && <ClientList clients={clients} users={users} user={user} onClientUpdate={fetchData} />}
+                        <div key={activeTab}>
+                            {activeTab === 'dashboard' && <Dashboard clients={clients} users={users} currentUser={user} />}
+                            {activeTab === 'clients' && <ClientList clients={clients} users={users} user={user} onClientUpdate={fetchData} />}
+                        </div>
                     </main>
                 </div>
             );
         };
         
-        const AddModal = ({ onClose, onAdd, users }) => {
+        const AddModal = memo(({ onClose, onAdd, users }) => {
             const [d, setD] = useState({ name: '', phone: '', projectType: 'سكني', serviceType: 'تصميم', status: 'New', driveLink: '', assignedTo: '', source: '' });
             return (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
@@ -632,9 +639,9 @@
                     </div>
                 </div>
             );
-        };
+        });
         
-        const EditModal = ({ c, onClose, onUpdate, users, user, onNote, onAddTask, onToggleTask, onDeleteTask }) => {
+        const EditModal = memo(({ c, onClose, onUpdate, users, user, onNote, onAddTask, onToggleTask, onDeleteTask }) => {
             const [d, setD] = useState({ ...c });
             const [note, setNote] = useState('');
             const [tab, setTab] = useState('chat');
@@ -675,7 +682,7 @@
                     </div>
                 </div>
             );
-        };
+        });
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
