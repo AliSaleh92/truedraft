@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #ffffff; touch-action: manipulation; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; touch-action: manipulation; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
@@ -24,7 +24,7 @@
         
         #initial-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff; z-index: 9999; display: flex; flex-direction: column;
+            background: #f8fafc; z-index: 9999; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
         }
         .loader { border: 4px solid #e5e7eb; border-top: 4px solid #000; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
@@ -91,7 +91,6 @@
         };
 
         const Icon = ({ name, size = 20, className = "" }) => {
-            useEffect(() => { if(window.lucide) window.lucide.createIcons(); }, [name]);
             return <i data-lucide={Icons[name]} width={size} height={size} className={className}></i>;
         };
         
@@ -116,10 +115,10 @@
             };
 
             return (
-                <div className="min-h-screen flex items-center justify-center bg-[#101414]">
-                    <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
+                <div className="min-h-screen flex items-center justify-center bg-slate-50">
+                    <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center border">
                         <img src="../images/logo.png" alt="True Draft" className="h-20 mx-auto mb-6 object-contain" onError={(e) => e.target.style.display='none'} />
-                        <h1 className="text-2xl font-bold mb-2">نظام True Draft</h1>
+                        <h1 className="text-2xl font-bold mb-2">True Draft ERP</h1>
                         <p className="text-gray-500 mb-8">تسجيل دخول الموظفين</p>
                         {err && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm">{err}</div>}
                         <form onSubmit={handleLogin} className="space-y-4">
@@ -135,8 +134,8 @@
         };
 
         const MODULES = [
-            { key: 'crm', name: 'نظام CRM', icon: 'Grid' },
-            { key: 'blog', name: 'المدونة', icon: 'FileText' },
+            { key: 'crm', name: 'إدارة العملاء (CRM)', icon: 'Grid' },
+            { key: 'blog', name: 'إدارة المدونة', icon: 'FileText' },
         ];
         const PERMISSIONS = [
             { key: 'supervisor', label: 'مشرف' },
@@ -224,7 +223,7 @@
             );
         };
 
-        const UserManagement = ({ users, onAddUser, onUpdatePermissions }) => {
+        const UserManagement = ({ users, onAddUser, onUpdatePermissions, onImpersonate }) => {
             const [isAddModalOpen, setAddModalOpen] = useState(false);
             const [editingUser, setEditingUser] = useState(null);
 
@@ -253,7 +252,7 @@
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
-                                    {users.map(u => (
+                                    {users.filter(u => u.email !== ADMIN_EMAIL).map(u => (
                                         <tr key={u.id}>
                                             <td className="p-4 font-bold">{u.name}</td>
                                             <td className="p-4 text-gray-500 date-en">{u.email}</td>
@@ -262,8 +261,8 @@
                                                     <button onClick={() => setEditingUser(u)} className="px-3 py-1.5 text-sm rounded-md bg-gray-100 hover:bg-gray-200 font-bold flex items-center gap-1.5">
                                                         <Icon name="Edit" size={14}/> تعديل الصلاحيات
                                                     </button>
-                                                    <button disabled className="px-3 py-1.5 text-sm rounded-md bg-gray-100 text-gray-400 font-bold flex items-center gap-1.5 cursor-not-allowed">
-                                                        <Icon name="KeyRound" size={14}/> دخول كـ
+                                                    <button onClick={() => onImpersonate(u)} className="px-3 py-1.5 text-sm rounded-md bg-gray-100 hover:bg-gray-200 font-bold flex items-center gap-1.5">
+                                                        <Icon name="KeyRound" size={14}/> عرض كـ
                                                     </button>
                                                 </div>
                                             </td>
@@ -282,26 +281,26 @@
         
         const Dashboard = () => {
             const Card = ({ title, desc, icon, href }) => (
-                <a href={href} className="bg-white p-8 rounded-2xl shadow-sm border text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center group">
-                    <div className="p-4 rounded-xl inline-block mb-5 bg-gray-100 group-hover:bg-black transition-colors">
-                        <Icon name={icon} className="text-gray-800 group-hover:text-white transition-colors" size={32} />
+                <a href={href} className="bg-white p-8 rounded-2xl shadow-sm border text-center hover:shadow-lg hover:border-black hover:-translate-y-1 transition-all duration-300 flex flex-col items-center group">
+                    <div className="p-4 rounded-full inline-block mb-5 bg-slate-100 group-hover:bg-black transition-colors duration-300">
+                        <Icon name={icon} className="text-gray-800 group-hover:text-white transition-colors duration-300" size={32} />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800">{title}</h3>
+                    <h3 className="text-xl font-bold text-gray-800">{title}</h3>
                     <p className="text-gray-500 mt-2 text-sm flex-grow">{desc}</p>
                 </a>
             );
 
             return (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 animate-fade-in max-w-4xl mx-auto mt-8">
-                    <Card title="إدارة العملاء" desc="نظام متكامل لإدارة العملاء، الصفقات، والملاحظات" icon="Grid" href="crm.html" />
-                    <Card title="المدونة" desc="إدارة وإنشاء مقالات للموقع العام" icon="FileText" href="../blog.html" />
+                    <Card title="إدارة العملاء (CRM)" desc="نظام متكامل لإدارة العملاء، الصفقات، والملاحظات" icon="Grid" href="crm.html" />
+                    <Card title="إدارة المدونة" desc="إدارة وإنشاء مقالات للموقع العام" icon="FileText" href="../blog.html" />
                 </div>
             );
         };
 
-        const Header = ({ user, route }) => {
+        const Header = ({ user, route, isImpersonating }) => {
             return (
-                <header className="bg-white h-20 border-b flex items-center justify-between px-6 shrink-0 z-10">
+                <header className="bg-white h-16 border-b flex items-center justify-between px-6 shrink-0 z-10 sticky top-0">
                     <div className="flex items-center gap-4">
                         {route !== '#home' ?
                             <a href="#home" className="text-gray-600 px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-100 transition">
@@ -315,26 +314,33 @@
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="text-right">
-                            <div className="font-bold flex items-center gap-2 justify-end">
-                                <span className="text-2xl">👋</span> مرحباً, {user.name}
-                            </div>
+                            <div className="font-bold">{user.name} 👋</div>
                             <div className="text-xs text-gray-500 font-bold uppercase tracking-wider text-right">
                                 {user.role === 'admin' ? 'لوحة تحكم المدير العام' : 'نظام الموظفين'}
                             </div>
                         </div>
-                        <div className="bg-gray-800 text-white w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl shadow-inner">
+                        <div className="bg-gray-800 text-white w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg shadow-inner">
                             TD
                         </div>
-                        {user.role === 'admin' &&
-                            <a href="#users" title="إدارة الموظفين" className={`p-3 rounded-lg font-bold flex items-center transition ${route === '#users' ? 'bg-black text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}>
+                        {user.role === 'admin' && !isImpersonating &&
+                            <a href="#users" title="إدارة الموظفين" className={`p-2.5 rounded-lg font-bold flex items-center transition ${route === '#users' ? 'bg-black text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}>
                                 <Icon name="UserCog" size={20} />
                             </a>
                         }
-                        <button onClick={() => window.authSignOut(window.auth)} title="تسجيل الخروج" className="bg-gray-100 text-gray-800 p-3 rounded-lg font-bold flex items-center hover:bg-gray-200 transition">
+                        <button onClick={() => window.authSignOut(window.auth)} title="تسجيل الخروج" className="bg-gray-100 text-gray-800 p-2.5 rounded-lg font-bold flex items-center hover:bg-gray-200 transition">
                             <Icon name="LogOut" size={20} />
                         </button>
                     </div>
                 </header>
+            );
+        };
+
+        const ImpersonationBanner = ({ impersonatedUser, onStop }) => {
+            return (
+                <div className="bg-yellow-400 text-black text-center p-3 font-bold flex items-center justify-center gap-4 sticky top-0 z-20">
+                    <p>أنت تعرض النظام بصلاحيات: {impersonatedUser.name}.</p>
+                    <button onClick={onStop} className="underline font-bold">العودة لحساب المدير</button>
+                </div>
             );
         };
 
@@ -344,12 +350,23 @@
             const [loading, setLoading] = useState(true);
             const [route, setRoute] = useState(window.location.hash || '#home');
             const [users, setUsers] = useState([]);
+            const [originalAdminUser, setOriginalAdminUser] = useState(null);
 
             useEffect(() => {
                 const handleHashChange = () => setRoute(window.location.hash || '#home');
                 window.addEventListener('hashchange', handleHashChange);
+                const storedAdmin = sessionStorage.getItem('originalAdminUser');
+                if (storedAdmin) {
+                    setOriginalAdminUser(JSON.parse(storedAdmin));
+                }
                 return () => window.removeEventListener('hashchange', handleHashChange);
             }, []);
+
+            useEffect(() => {
+                if(window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [route, user, originalAdminUser]);
 
             useEffect(() => {
                 const interval = setInterval(() => {
@@ -370,18 +387,35 @@
 
                                     let currentUser = userList.find(x => x.email === u.email);
                                     if (u.email === ADMIN_EMAIL) {
-                                        currentUser = { id: 'admin', name: 'الملك', email: u.email, role: 'admin' };
+                                        currentUser = { id: 'admin', name: 'Ali Saleh', email: u.email, role: 'admin' };
                                     }
 
-                                    if (currentUser) {
-                                        setUser(currentUser);
+                                    if (!currentUser) {
+                                        setUser({ name: u.email.split('@')[0], email: u.email, role: 'employee' });
+                                        setLoading(false);
+                                        return;
+                                    }
+
+                                    const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
+                                    const storedAdmin = sessionStorage.getItem('originalAdminUser');
+
+                                    if(currentUser.role === 'admin' && impersonatedUserEmail && storedAdmin) {
+                                        const targetUser = userList.find(x => x.email === impersonatedUserEmail);
+                                        if (targetUser) {
+                                            setOriginalAdminUser(JSON.parse(storedAdmin));
+                                            setUser(targetUser);
+                                        } else {
+                                            setUser(currentUser);
+                                        }
                                     } else {
-                                        setUser({ name: u.email.split('@')[0], email: u.email, role: 'employee' }); // Fallback
+                                        setUser(currentUser);
                                     }
                                     setLoading(false);
                                 });
                             } else {
                                 setUser(null);
+                                setOriginalAdminUser(null);
+                                sessionStorage.clear();
                                 setLoading(false);
                                 if(window.location.hash) window.location.hash = '';
                             }
@@ -390,6 +424,21 @@
                 }, 100);
                 return () => clearInterval(interval);
             }, []);
+
+            const impersonateUser = (targetUser) => {
+                sessionStorage.setItem('originalAdminUser', JSON.stringify(user));
+                sessionStorage.setItem('impersonatedUserEmail', targetUser.email);
+                setOriginalAdminUser(user);
+                setUser(targetUser);
+            };
+
+            const stopImpersonation = () => {
+                const adminUser = JSON.parse(sessionStorage.getItem('originalAdminUser'));
+                sessionStorage.removeItem('originalAdminUser');
+                sessionStorage.removeItem('impersonatedUserEmail');
+                setOriginalAdminUser(null);
+                setUser(adminUser);
+            };
 
             const addUser = (userData) => {
                  const defaultPermissions = MODULES.reduce((acc, module) => ({...acc, [module.key]: 'employee'}), {});
@@ -411,8 +460,10 @@
             const renderPage = () => {
                 switch(route) {
                     case '#home': return <Dashboard />;
-                    case '#users': return user.role === 'admin' ? <UserManagement users={users} onAddUser={addUser} onUpdatePermissions={updatePermissions}/> : <p>Access Denied</p>;
-                    default: return <Dashboard />;
+                    case '#users': return (user.role === 'admin' && !originalAdminUser) ? <UserManagement users={users} onAddUser={addUser} onUpdatePermissions={updatePermissions} onImpersonate={impersonateUser}/> : <Dashboard />;
+                    default: 
+                        window.location.hash = '#home';
+                        return <Dashboard />;
                 }
             };
             
@@ -420,8 +471,9 @@
             if (!user) return <Login />;
 
             return (
-                <div className="flex flex-col min-h-screen">
-                    <Header user={user} route={route} />
+                <div className="flex flex-col min-h-screen bg-slate-50">
+                    {originalAdminUser && <ImpersonationBanner impersonatedUser={user} onStop={stopImpersonation} />}
+                    <Header user={user} route={route} isImpersonating={!!originalAdminUser} />
                     <main className="flex-1 p-6 md:p-8">
                         {renderPage()}
                     </main>
