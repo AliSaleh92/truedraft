@@ -40,6 +40,7 @@
             window.dbRef = ref; window.dbPush = push; window.dbSet = set; window.dbOnValue = onValue;
             window.dbRemove = remove; window.dbUpdate = update; window.dbGet = get;
             window.authListener = onAuthStateChanged;
+            window.firebaseIsReady = true;
             document.dispatchEvent(new Event('firebaseReady'));
         } catch (error) { console.error("Firebase Init Error:", error); }
     </script>
@@ -216,7 +217,7 @@
                                 if(targetEntry) currentUser = { id: targetEntry[0], ...targetEntry[1] };
                             }
 
-                            if (currentUser && (currentUser.role === 'admin' || currentUser.permissions?.blog === 'supervisor')) {
+                            if (currentUser && (currentUser.role === 'admin' || (currentUser.permissions && currentUser.permissions.blog === 'supervisor'))) {
                                 setUser(currentUser);
                             } else {
                                 alert('ليس لديك الصلاحية للوصول لهذه الصفحة.'); window.location.href = 'erp.html';
@@ -229,7 +230,12 @@
                         if (loader) loader.style.display = 'none';
                     });
                 };
-                document.addEventListener('firebaseReady', initAuth, { once: true });
+                
+                if (window.firebaseIsReady) {
+                    initAuth();
+                } else {
+                    document.addEventListener('firebaseReady', initAuth, { once: true });
+                }
             }, []);
 
             if (loading || !user) return null;
