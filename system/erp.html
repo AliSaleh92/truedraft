@@ -163,7 +163,7 @@
                     <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold">إضافة موظف جديد</h3>
-                            <button onClick={onClose} className="text-gray-400 hover:text-gray-800 p-1.5 rounded-full transition-colors hover:bg-gray-100">
+                            <button onClick={onClose} className="p-2 text-gray-600 rounded-full hover:bg-gray-100 hover:text-black">
                                 <Icon name="X" size={24} />
                             </button>
                         </div>
@@ -212,7 +212,7 @@
                                 </div>
                                 <div>
                                     <label className="text-sm font-bold mb-1 block">البريد الإلكتروني</label>
-                                    <input type="email" className="w-full border p-2 rounded date-en" value={details.email} readOnly disabled title="لا يمكن تغيير البريد الإلكتروني بعد الإنشاء." />
+                                    <input type="email" className="w-full border p-2 rounded date-en bg-gray-100 cursor-not-allowed" value={details.email} readOnly disabled title="لا يمكن تغيير البريد الإلكتروني بعد الإنشاء." />
                                 </div>
                             </div>
                             
@@ -286,7 +286,7 @@
                                                         <Icon name="Edit" size={14}/> تعديل
                                                     </button>
                                                     <button onClick={() => onImpersonate(u)} className="px-3 py-1.5 text-sm rounded-md bg-gray-100 hover:bg-gray-200 font-bold flex items-center gap-1.5">
-                                                        <Icon name="KeyRound" size={14}/> عرض كـ
+                                                        <Icon name="KeyRound" size={14}/> الدخول كـ
                                                     </button>
                                                 </div>
                                             </td>
@@ -392,7 +392,7 @@
                 if (window.lucide) {
                     window.lucide.createIcons();
                 }
-            });
+            }, [route]);
 
 
             useEffect(() => {
