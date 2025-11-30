@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #f3f4f6; touch-action: manipulation; }
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; touch-action: manipulation; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
@@ -24,7 +24,7 @@
         
         #initial-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #f3f4f6; z-index: 9999; display: flex; flex-direction: column;
+            background: #f8fafc; z-index: 9999; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
         }
         .loader { border: 4px solid #e5e7eb; border-top: 4px solid #000; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
@@ -85,10 +85,9 @@
         const { useState, useEffect, useMemo, useRef } = React;
 
         const Icons = {
-            LayoutDashboard: "layout-dashboard", Users: "users", LogOut: "log-out", 
-            Plus: "plus", Trash2: "trash-2", Edit2: "edit-2", 
-            ExternalLink: "external-link", X: "x", Shield: "shield", 
-            Menu: "menu", Save: "save", FileText: "file-text",
+            Users: "users-2", Briefcase: "briefcase", Clock: "clock", Grid: "layout-grid",
+            LogOut: "log-out", UserCog: "user-cog", Plus: "plus", X: "x", ArrowLeft: "arrow-left",
+            Trash2: "trash-2", Edit: "edit", KeyRound: "key-round",
         };
 
         const Icon = ({ name, size = 20, className = "" }) => {
@@ -96,11 +95,6 @@
             return <i data-lucide={Icons[name]} width={size} height={size} className={className}></i>;
         };
         
-        const formatDate = (iso) => {
-            if (!iso) return '-';
-            return <span className="date-en">{new Date(iso).toLocaleDateString('en-GB')}</span>;
-        };
-
         const Login = () => {
             const [email, setEmail] = useState('');
             const [pass, setPass] = useState('');
@@ -140,313 +134,215 @@
             );
         };
 
-        const Users = ({ users }) => {
+        const MODULES = [
+            { key: 'crm', name: 'نظام CRM', icon: 'Grid' },
+            { key: 'attendance', name: 'نظام الحضور', icon: 'Clock' },
+            { key: 'projects', name: 'إدارة المشاريع', icon: 'Briefcase' },
+            { key: 'hr', name: 'الموارد البشرية', icon: 'Users' },
+        ];
+        const PERMISSIONS = [
+            { key: 'supervisor', label: 'مشرف' },
+            { key: 'employee', label: 'موظف' },
+            { key: 'none', label: 'لا يوجد' }
+        ];
+
+        const AddUserModal = ({ onClose, onSave }) => {
             const [name, setName] = useState('');
             const [email, setEmail] = useState('');
-            const [role, setRole] = useState('sales');
-            const [editU, setEditU] = useState(null);
+            const [uid, setUid] = useState('');
 
-            const getRoleInfo = (role) => {
-                if (role === 'admin') return { label: 'مدير', color: 'bg-purple-100 text-purple-700' };
-                if (role === 'supervisor') return { label: 'مشرف', color: 'bg-yellow-100 text-yellow-700' };
-                return { label: 'موظف', color: 'bg-blue-100 text-blue-700' };
-            };
-
-            const addUserProfile = (e) => {
-                e.preventDefault();
-                const newRef = window.dbPush(window.dbRef(window.db, 'users'));
-                window.dbSet(newRef, { name, email, role });
-                setName(''); setEmail('');
-                alert('تم إضافة ملف الموظف.');
-            };
-
-            const deleteUser = (id) => {
-                if(confirm('حذف المستخدم؟')) window.dbRemove(window.dbRef(window.db, `users/${id}`));
-            };
-
-            const updateUser = () => {
-                if(editU) {
-                    window.dbUpdate(window.dbRef(window.db, `users/${editU.id}`), { name: editU.name, role: editU.role });
-                    setEditU(null);
+            const handleSave = () => {
+                if (!name || !email || !uid) {
+                    alert('يرجى تعبئة جميع الحقول.');
+                    return;
                 }
+                onSave({ name, email, uid });
             };
 
             return (
-                <div className="space-y-8 animate-fade-in">
-                    <h2 className="text-2xl font-bold">إدارة المستخدمين</h2>
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="bg-white p-6 rounded-xl shadow-sm border h-fit">
-                            <h3 className="font-bold mb-4">إضافة ملف موظف</h3>
-                            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs p-3 rounded mb-4">
-                                تنبيه هام: قم بإضافة إيميلات الموظفين هنا (مثل omar@truedraft.com.sa) ليتمكنوا من استخدام النظام بعد تسجيل دخولهم.
-                            </div>
-                            <form onSubmit={addUserProfile} className="space-y-3">
-                                <div>
-                                    <label className="text-sm font-bold mb-1 block">الاسم</label>
-                                    <input required className="w-full border p-2 rounded focus:border-black outline-none" value={name} onChange={e=>setName(e.target.value)} />
-                                </div>
-                                <div>
-                                    <label className="text-sm font-bold mb-1 block">البريد الإلكتروني</label>
-                                    <input required type="email" className="w-full border p-2 rounded date-en focus:border-black outline-none" value={email} onChange={e=>setEmail(e.target.value)} />
-                                </div>
-                                <div>
-                                    <label className="text-sm font-bold mb-1 block">الصلاحية</label>
-                                    <select className="w-full border p-2 rounded bg-white" value={role} onChange={e=>setRole(e.target.value)}>
-                                        <option value="sales">موظف</option>
-                                        <option value="supervisor">مشرف</option>
-                                        <option value="admin">مدير</option>
-                                    </select>
-                                </div>
-                                <button className="w-full bg-black text-white py-3 rounded font-bold hover:bg-gray-800">حفظ الملف</button>
-                            </form>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                    <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-bold">إضافة موظف جديد</h3>
+                            <button onClick={onClose}><Icon name="X" /></button>
                         </div>
-                        <div className="md:col-span-2 bg-white rounded-xl shadow-sm border overflow-hidden">
-                            <table className="w-full text-right">
-                                <thead className="bg-gray-50 text-gray-500 font-bold">
-                                    <tr><th className="p-4">الاسم</th><th className="p-4">البريد</th><th className="p-4">الصلاحية</th><th className="p-4">إجراء</th></tr>
-                                </thead>
-                                <tbody className="divide-y">
-                                    {users.map(u => {
-                                        const roleInfo = getRoleInfo(u.role);
-                                        return (
-                                        <tr key={u.id}>
-                                            <td className="p-4">{editU?.id === u.id ? <input className="border p-1 w-full" value={editU.name} onChange={e=>setEditU({...editU, name:e.target.value})} /> : u.name}</td>
-                                            <td className="p-4 text-gray-500 date-en">{u.email}</td>
-                                            <td className="p-4">
-                                                {editU?.id === u.id ? 
-                                                    <select className="border p-1" value={editU.role} onChange={e=>setEditU({...editU, role:e.target.value})}>
-                                                        <option value="sales">موظف</option>
-                                                        <option value="supervisor">مشرف</option>
-                                                        <option value="admin">مدير</option>
-                                                    </select> 
-                                                    : <span className={`px-2 py-1 rounded text-xs font-bold ${roleInfo.color}`}>{roleInfo.label}</span>
-                                                }
-                                            </td>
-                                            <td className="p-4 flex gap-2">
-                                                {editU?.id === u.id ? 
-                                                    <button onClick={updateUser} className="text-green-600"><Icon name="Save" size={16}/></button> 
-                                                    : <button onClick={()=>setEditU(u)} className="text-blue-500"><Icon name="Edit2" size={16}/></button>
-                                                }
-                                                <button onClick={()=>deleteUser(u.id)} className="text-red-400"><Icon name="Trash2" size={16}/></button>
-                                            </td>
-                                        </tr>
-                                    )})}
-                                </tbody>
-                            </table>
+                        <div className="space-y-4">
+                            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs p-3 rounded-lg">
+                                تنبيه: يجب إنشاء حساب للموظف أولاً في صفحة Authentication ثم نسخ الـ UID ولصقه هنا.
+                            </div>
+                            <div><label className="text-sm font-bold mb-1 block">الاسم الثلاثي</label><input className="w-full border p-2 rounded" value={name} onChange={e=>setName(e.target.value)} /></div>
+                            <div><label className="text-sm font-bold mb-1 block">البريد الإلكتروني</label><input type="email" className="w-full border p-2 rounded date-en" value={email} onChange={e=>setEmail(e.target.value)} /></div>
+                            <div><label className="text-sm font-bold mb-1 block">UID</label><input className="w-full border p-2 rounded date-en" value={uid} onChange={e=>setUid(e.target.value)} /></div>
+                            <button onClick={handleSave} className="w-full bg-black text-white py-3 rounded-lg font-bold mt-4 hover:bg-gray-800">حفظ ومتابعة</button>
                         </div>
                     </div>
                 </div>
             );
         };
         
-        const BlogModal = ({ post, onClose }) => {
-            const [data, setData] = useState(post || {
-                title_ar: '', title_en: '', category_ar: '', category_en: '',
-                imageUrl: '', content_ar: '', content_en: ''
-            });
+        const EditPermissionsModal = ({ user, onClose, onSave }) => {
+            const [permissions, setPermissions] = useState(user.permissions || {});
 
-            const slugify = (text) => text.toString().toLowerCase()
-                .replace(/\s+/g, '-')
-                .replace(/[^\w-]+/g, '')
-                .replace(/--+/g, '-')
-                .replace(/^-+/, '').replace(/-+$/, '');
-
-            const handleSave = () => {
-                if (!data.title_en || !data.title_ar) {
-                    alert('الرجاء تعبئة العنوان بالعربي والإنجليزي.');
-                    return;
-                }
-                const slug = data.slug || slugify(data.title_en);
-                const postData = { ...data, slug, date: data.date || new Date().toISOString() };
-                
-                if (post?.id) { // Update
-                    window.dbUpdate(window.dbRef(window.db, `blogPosts/${post.id}`), postData);
-                } else { // Create
-                    const newRef = window.dbPush(window.dbRef(window.db, 'blogPosts'));
-                    window.dbSet(newRef, postData);
-                }
-                onClose();
+            const handlePermissionChange = (moduleKey, permissionKey) => {
+                setPermissions(prev => ({...prev, [moduleKey]: permissionKey }));
             };
-            
-            const handleChange = (e) => setData({ ...data, [e.target.name]: e.target.value });
 
             return (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-                    <div className="bg-white w-full max-w-4xl rounded-2xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
-                        <div className="flex justify-between items-center mb-6 border-b pb-4">
-                            <h3 className="text-xl font-bold">{post ? 'تعديل المقال' : 'إضافة مقال جديد'}</h3>
+                    <div className="bg-white w-full max-w-2xl rounded-2xl p-6 shadow-2xl max-h-[90vh] flex flex-col">
+                        <div className="flex justify-between items-center mb-2">
+                            <div>
+                                <h3 className="text-xl font-bold">تعديل صلاحيات: {user.name}</h3>
+                                <p className="text-sm text-gray-500 date-en">{user.email}</p>
+                            </div>
                             <button onClick={onClose}><Icon name="X" /></button>
                         </div>
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div><label className="text-sm font-bold mb-1 block">العنوان (عربي)</label><input name="title_ar" value={data.title_ar} onChange={handleChange} className="w-full border p-2 rounded"/></div>
-                                <div><label className="text-sm font-bold mb-1 block">العنوان (إنجليزي)</label><input name="title_en" value={data.title_en} onChange={handleChange} className="w-full border p-2 rounded"/></div>
+                        <div className="flex-grow overflow-y-auto pr-2 -mr-2 mt-4">
+                            <div className="space-y-4">
+                                {MODULES.map(module => (
+                                    <div key={module.key} className="p-4 border rounded-xl">
+                                        <div className="font-bold flex items-center gap-2 mb-3"><Icon name={module.icon} size={18} /> {module.name}</div>
+                                        <div className="flex items-center gap-2">
+                                            {PERMISSIONS.map(perm => (
+                                                <button 
+                                                    key={perm.key}
+                                                    onClick={() => handlePermissionChange(module.key, perm.key)}
+                                                    className={`px-4 py-2 text-sm rounded-lg border-2 font-bold transition ${permissions[module.key] === perm.key ? 'bg-black text-white border-black' : 'bg-gray-100 border-gray-100 hover:border-gray-300'}`}
+                                                >
+                                                    {perm.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div><label className="text-sm font-bold mb-1 block">التصنيف (عربي)</label><input name="category_ar" value={data.category_ar} onChange={handleChange} className="w-full border p-2 rounded"/></div>
-                                <div><label className="text-sm font-bold mb-1 block">التصنيف (إنجليزي)</label><input name="category_en" value={data.category_en} onChange={handleChange} className="w-full border p-2 rounded"/></div>
-                            </div>
-                            <div><label className="text-sm font-bold mb-1 block">رابط صورة المقال</label><input name="imageUrl" value={data.imageUrl} onChange={handleChange} className="w-full border p-2 rounded ltr"/></div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div><label className="text-sm font-bold mb-1 block">المحتوى (عربي - Markdown)</label><textarea name="content_ar" value={data.content_ar} onChange={handleChange} className="w-full border p-2 rounded h-48"></textarea></div>
-                                <div><label className="text-sm font-bold mb-1 block">المحتوى (إنجليزي - Markdown)</label><textarea name="content_en" value={data.content_en} onChange={handleChange} className="w-full border p-2 rounded h-48"></textarea></div>
-                            </div>
-                            <button onClick={handleSave} className="w-full bg-black text-white py-3 rounded-lg font-bold mt-4">حفظ المقال</button>
+                        </div>
+                        <div className="mt-6 pt-4 border-t flex gap-2">
+                            <button onClick={() => onSave(user.id, permissions)} className="flex-1 bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800">حفظ الصلاحيات</button>
+                            <button onClick={onClose} className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-bold hover:bg-gray-300">إلغاء</button>
                         </div>
                     </div>
                 </div>
-            )
+            );
         };
-        
-        const Blog = () => {
-            const [posts, setPosts] = useState([]);
-            const [isLoading, setIsLoading] = useState(true);
-            const [isModalOpen, setIsModalOpen] = useState(false);
-            const [editingPost, setEditingPost] = useState(null);
 
-            useEffect(() => {
-                const postsRef = window.dbRef(window.db, 'blogPosts');
-                const unsubscribe = window.dbOnValue(postsRef, (snapshot) => {
-                    const data = snapshot.val();
-                    const postsList = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })).sort((a, b) => new Date(b.date) - new Date(a.date)) : [];
-                    setPosts(postsList);
-                    setIsLoading(false);
-                });
-                return () => unsubscribe();
-            }, []);
-            
-            const handleOpenModal = (post = null) => {
-                setEditingPost(post);
-                setIsModalOpen(true);
+        const UserManagement = ({ users, onAddUser, onUpdatePermissions }) => {
+            const [isAddModalOpen, setAddModalOpen] = useState(false);
+            const [editingUser, setEditingUser] = useState(null);
+
+            const handleSaveUser = (data) => {
+                onAddUser(data);
+                setAddModalOpen(false);
             };
 
-            const handleCloseModal = () => {
-                setEditingPost(null);
-                setIsModalOpen(false);
-            };
-
-            const deletePost = (id) => {
-                if(confirm('هل أنت متأكد من حذف هذا المقال؟')) {
-                    window.dbRemove(window.dbRef(window.db, `blogPosts/${id}`));
-                }
-            };
-            
             return (
                 <div className="space-y-6 animate-fade-in">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-bold">إدارة المدونة</h2>
-                        <button onClick={() => handleOpenModal()} className="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-2 font-bold hover:bg-gray-800">
-                            <Icon name="Plus" size={18} /> إضافة مقال
+                        <h2 className="text-2xl font-bold">إدارة الموظفين</h2>
+                        <button onClick={() => setAddModalOpen(true)} className="bg-black text-white px-4 py-2 rounded-lg flex items-center gap-2 font-bold hover:bg-gray-800">
+                            <Icon name="Plus" size={18} /> إضافة موظف جديد
                         </button>
                     </div>
 
                     <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                        <table className="w-full text-right text-sm">
-                            <thead className="bg-gray-50 font-bold border-b">
-                                <tr>
-                                    <th className="p-4">العنوان</th>
-                                    <th className="p-4">التصنيف</th>
-                                    <th className="p-4">تاريخ النشر</th>
-                                    <th className="p-4">إجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {isLoading ? <tr><td colSpan="4" className="text-center p-8">جاري التحميل...</td></tr> :
-                                posts.map(p => (
-                                    <tr key={p.id} className="border-b last:border-0 hover:bg-gray-50">
-                                        <td className="p-4 font-bold">{p.title_ar}</td>
-                                        <td className="p-4 text-gray-600">{p.category_ar}</td>
-                                        <td className="p-4 text-gray-500">{formatDate(p.date)}</td>
-                                        <td className="p-4">
-                                            <div className="flex gap-2">
-                                                <button onClick={() => handleOpenModal(p)} className="text-blue-500"><Icon name="Edit2" size={16}/></button>
-                                                <a href={`../blog-post.html?slug=${p.slug}`} target="_blank" className="text-gray-500"><Icon name="ExternalLink" size={16}/></a>
-                                                <button onClick={() => deletePost(p.id)} className="text-red-400"><Icon name="Trash2" size={16}/></button>
-                                            </div>
-                                        </td>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-right">
+                                <thead className="bg-gray-50/50 text-gray-500 font-bold">
+                                    <tr>
+                                        <th className="p-4">الاسم</th>
+                                        <th className="p-4">البريد</th>
+                                        <th className="p-4 text-center">الإجراءات</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y">
+                                    {users.map(u => (
+                                        <tr key={u.id}>
+                                            <td className="p-4 font-bold">{u.name}</td>
+                                            <td className="p-4 text-gray-500 date-en">{u.email}</td>
+                                            <td className="p-4">
+                                                <div className="flex justify-center items-center gap-2">
+                                                    <button onClick={() => setEditingUser(u)} className="px-3 py-1.5 text-sm rounded-md bg-gray-100 hover:bg-gray-200 font-bold flex items-center gap-1.5">
+                                                        <Icon name="Edit" size={14}/> تعديل الصلاحيات
+                                                    </button>
+                                                    <button disabled className="px-3 py-1.5 text-sm rounded-md bg-gray-100 text-gray-400 font-bold flex items-center gap-1.5 cursor-not-allowed">
+                                                        <Icon name="KeyRound" size={14}/> دخول كـ
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    {isModalOpen && <BlogModal post={editingPost} onClose={handleCloseModal} />}
+
+                    {isAddModalOpen && <AddUserModal onClose={() => setAddModalOpen(false)} onSave={handleSaveUser} />}
+                    {editingUser && <EditPermissionsModal user={editingUser} onClose={() => setEditingUser(null)} onSave={onUpdatePermissions} />}
+                </div>
+            );
+        };
+        
+        const Dashboard = () => {
+            const Card = ({ title, desc, icon, href, color }) => (
+                <a href={href} className="bg-white p-6 rounded-2xl shadow-sm border text-right hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-start group">
+                    <div className={`p-3 rounded-xl inline-block mb-4 ${color}`}>
+                        <Icon name={icon} className="text-gray-800" size={24} />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-800">{title}</h3>
+                    <p className="text-gray-500 mt-1 text-sm flex-grow">{desc}</p>
+                </a>
+            );
+
+            return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+                    <Card title="إدارة العملاء" desc="إدارة العمل والصفقات والتقارير" icon="Grid" href="crm.html" color="bg-blue-100" />
+                    <Card title="الحضور" desc="تسجيل الحضور اليومي وساعات العمل" icon="Clock" href="#" color="bg-yellow-100" />
+                    <Card title="المشاريع" desc="إدارة المشاريع والمهام والإنجاز" icon="Briefcase" href="#" color="bg-green-100" />
+                    <Card title="الموارد البشرية" desc="إدارة الموظفين، الرواتب والوثائق" icon="Users" href="#users" color="bg-pink-100" />
                 </div>
             );
         };
 
-        const HomeDashboard = ({ user }) => {
-            const Card = ({ title, desc, icon, href, isExternal = false }) => (
-                <a href={href} target={isExternal ? '_self' : ''} className="bg-white p-6 rounded-2xl shadow-sm border text-right hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col items-start justify-between group">
-                    <div>
-                        <div className="bg-gray-100 p-3 rounded-xl inline-block mb-4">
-                            <Icon name={icon} className="text-gray-700" size={24} />
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-800">{title}</h3>
-                        <p className="text-gray-500 mt-2 text-sm">{desc}</p>
-                    </div>
-                    <div className="mt-6 text-sm font-bold text-black flex items-center gap-2">
-                        <span>دخول للنظام</span>
-                        <i data-lucide="arrow-left" width="16" height="16" className="transition-transform group-hover:translate-x-[-4px]"></i>
-                    </div>
-                </a>
-            );
-
-            useEffect(() => { lucide.createIcons(); }, []);
-
+        const Header = ({ user, route }) => {
             return (
-                <div className="animate-fade-in">
-                    <div className="mb-8">
-                        <h2 className="text-3xl font-bold text-gray-800">القائمة الرئيسية</h2>
-                        <p className="text-gray-500 mt-1">اختر النظام الذي تريد الدخول إليه.</p>
+                <header className="bg-white h-20 border-b flex items-center justify-between px-6 shrink-0 shadow-sm z-10">
+                    <div className="flex items-center gap-4">
+                        {route !== '#home' && 
+                            <a href="#home" className="text-gray-600 px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-100 transition">
+                                <Icon name="ArrowLeft" size={18} /> رجوع
+                            </a>
+                        }
+                        {user.role === 'admin' &&
+                            <a href="#users" className={`px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition ${route === '#users' ? 'bg-black text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}>
+                                <Icon name="UserCog" size={18} /> إدارة الموظفين
+                            </a>
+                        }
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <Card title="إدارة العملاء (CRM)" desc="عرض وإدارة جميع العملاء والمشاريع." icon="Users" href="crm.html" isExternal={true} />
-                        {user.role === 'admin' && (
-                            <>
-                                <Card title="إدارة الموظفين" desc="إضافة وتعديل صلاحيات الموظفين." icon="Shield" href="#users" />
-                                <Card title="إدارة المدونة" desc="كتابة ونشر وتعديل المقالات." icon="FileText" href="#blog" />
-                            </>
-                        )}
+                    <div className="flex items-center gap-4">
+                        <div className="text-right">
+                            <div className="font-bold flex items-center gap-2 justify-end">
+                                <span className="text-2xl">👋</span> مرحباً, {user.name}
+                            </div>
+                            <div className="text-xs text-gray-500 font-bold uppercase tracking-wider text-right">
+                                {user.role === 'admin' ? 'لوحة تحكم المدير العام' : 'نظام الموظفين'}
+                            </div>
+                        </div>
+                        <div className="bg-gray-800 text-white w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl shadow-inner">
+                            TD
+                        </div>
+                        <button onClick={() => window.authSignOut(window.auth)} className="bg-red-50 text-red-600 px-3 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-red-100 transition">
+                            <Icon name="LogOut" size={18} />
+                        </button>
                     </div>
-                </div>
+                </header>
             );
         };
 
-        const Sidebar = ({ route, isOpen, setIsOpen, user }) => {
-            const Link = ({ to, icon, label }) => (
-                <a href={to} onClick={() => { if(window.innerWidth < 768) setIsOpen(false); }} className={`flex items-center gap-3 w-full p-3 rounded-lg transition ${route === to ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
-                    <Icon name={icon} size={20} /> <span>{label}</span>
-                </a>
-            );
-            return (
-                <>
-                    {isOpen && <div className="fixed inset-0 bg-black/50 z-20 md:hidden" onClick={() => setIsOpen(false)}></div>}
-                    <aside className={`fixed md:relative z-30 bg-[#101414] text-white w-64 h-screen flex flex-col transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}`}>
-                        <div className="h-20 flex items-center justify-center border-b border-gray-800">
-                            <img src="../images/logo.png" alt="True Draft" className="h-12 object-contain" />
-                        </div>
-                        <nav className="flex-1 p-4 space-y-2">
-                            <Link to="#home" icon="LayoutDashboard" label="القائمة الرئيسية" />
-                            {user.role === 'admin' && (
-                                <>
-                                    <hr className="border-gray-700 my-2" />
-                                    <div className="text-xs text-gray-500 font-bold uppercase px-3 pt-2">الإدارة</div>
-                                    <Link to="#users" icon="Shield" label="إدارة الموظفين" />
-                                    <Link to="#blog" icon="FileText" label="إدارة المدونة" />
-                                </>
-                            )}
-                        </nav>
-                    </aside>
-                </>
-            );
-        };
         const ADMIN_EMAIL = "al2we09@gmail.com";
         const App = () => {
             const [user, setUser] = useState(null);
             const [loading, setLoading] = useState(true);
             const [route, setRoute] = useState(window.location.hash || '#home');
-            const [sidebarOpen, setSidebarOpen] = useState(false);
-            
             const [users, setUsers] = useState([]);
 
             useEffect(() => {
@@ -459,35 +355,28 @@
                 const interval = setInterval(() => {
                     if (window.firebaseReady) {
                         clearInterval(interval);
-                        const loader = document.getElementById('initial-loader');
-                        if (loader) loader.style.display = 'none';
+                        document.getElementById('initial-loader')?.style.display = 'none';
 
-                        const unsub = window.authListener(window.auth, (u) => {
+                        window.authListener(window.auth, (u) => {
                             if (u) {
-                                window.dbGet(window.dbRef(window.db, 'users')).then(snap => {
+                                const usersRef = window.dbRef(window.db, 'users');
+                                window.dbOnValue(usersRef, (snap) => {
                                     const val = snap.val();
                                     const userList = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
                                     setUsers(userList);
 
                                     let currentUser = userList.find(x => x.email === u.email);
-                                    
                                     if (u.email === ADMIN_EMAIL) {
-                                        currentUser = { name: 'الملك', email: u.email, role: 'admin' };
+                                        currentUser = { id: 'admin', name: 'الملك', email: u.email, role: 'admin' };
                                     }
 
                                     if (currentUser) {
                                         setUser(currentUser);
                                     } else {
-                                        setUser({ name: u.email.split('@')[0], email: u.email, role: 'sales' });
+                                        setUser({ name: u.email.split('@')[0], email: u.email, role: 'employee' }); // Fallback
                                     }
                                     setLoading(false);
                                 });
-                                
-                                window.dbOnValue(window.dbRef(window.db, 'users'), (s) => {
-                                    const d = s.val();
-                                    setUsers(d ? Object.keys(d).map(k => ({ id: k, ...d[k] })) : []);
-                                });
-
                             } else {
                                 setUser(null);
                                 setLoading(false);
@@ -496,54 +385,43 @@
                         });
                     }
                 }, 100);
-
                 return () => clearInterval(interval);
             }, []);
 
+            const addUser = (userData) => {
+                 const defaultPermissions = MODULES.reduce((acc, module) => ({...acc, [module.key]: 'employee'}), {});
+                 const newRef = window.dbRef(window.db, `users/${userData.uid}`);
+                 window.dbSet(newRef, { 
+                     name: userData.name, 
+                     email: userData.email, 
+                     uid: userData.uid, 
+                     permissions: defaultPermissions 
+                 });
+                 alert('تمت إضافة الموظف بنجاح.');
+            };
+
+            const updatePermissions = (userId, permissions) => {
+                window.dbUpdate(window.dbRef(window.db, `users/${userId}/permissions`), permissions);
+                alert('تم تحديث الصلاحيات.');
+            };
+
             const renderPage = () => {
                 switch(route) {
-                    case '#home': return <HomeDashboard user={user} />;
-                    case '#users': return user.role === 'admin' ? <Users users={users} /> : <p>Access Denied</p>;
-                    case '#blog': return user.role === 'admin' ? <Blog /> : <p>Access Denied</p>;
-                    default: return <HomeDashboard user={user} />;
+                    case '#home': return <Dashboard />;
+                    case '#users': return user.role === 'admin' ? <UserManagement users={users} onAddUser={addUser} onUpdatePermissions={updatePermissions}/> : <p>Access Denied</p>;
+                    default: return <Dashboard />;
                 }
             };
             
-            if (loading) return <div className="h-screen flex items-center justify-center"></div>;
-
+            if (loading) return null;
             if (!user) return <Login />;
 
             return (
-                <div className="flex min-h-screen" dir="rtl">
-                    <Sidebar route={route} isOpen={sidebarOpen} setIsOpen={setSidebarOpen} user={user} />
-                    <div className="flex-1 flex flex-col min-w-0 overflow-hidden h-screen">
-                        
-                        <header className="bg-white h-20 border-b flex items-center justify-between px-6 shrink-0 shadow-sm z-20">
-                            
-                            <div className="flex items-center gap-4">
-                                <button className="md:hidden" onClick={() => setSidebarOpen(true)}><Icon name="Menu" /></button>
-                                
-                                <button onClick={() => window.authSignOut(window.auth)} className="bg-red-50 text-red-600 px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-red-100 transition">
-                                    <Icon name="LogOut" size={18} /> خروج
-                                </button>
-                            </div>
-
-                            <div className="flex items-center gap-4">
-                                <div className="text-left">
-                                    <div className="text-xl font-bold flex items-center gap-2 justify-end">
-                                        {user.name} <span className="text-2xl">👋</span>
-                                    </div>
-                                    <div className="text-xs text-gray-500 font-bold uppercase tracking-wider text-right">
-                                        {user.role === 'admin' ? 'لوحة تحكم المدير العام' : 'نظام الموظفين'}
-                                    </div>
-                                </div>
-                            </div>
-                        </header>
-
-                        <main className="flex-1 overflow-y-auto p-6 md:p-8 bg-[#f3f4f6]">
-                            {renderPage()}
-                        </main>
-                    </div>
+                <div className="flex flex-col min-h-screen">
+                    <Header user={user} route={route} />
+                    <main className="flex-1 p-6 md:p-8">
+                        {renderPage()}
+                    </main>
                 </div>
             );
         };
