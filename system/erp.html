@@ -71,6 +71,7 @@
             window.authSignIn = signInWithEmailAndPassword;
             window.authSignOut = signOut;
             window.authListener = onAuthStateChanged;
+            window.firebaseIsReady = true;
             document.dispatchEvent(new Event('firebaseReady'));
         } catch (error) {
             console.error("Firebase Init Error:", error);
@@ -311,7 +312,12 @@
                         }
                     });
                 };
-                document.addEventListener('firebaseReady', initAuth, { once: true });
+                
+                if (window.firebaseIsReady) {
+                    initAuth();
+                } else {
+                    document.addEventListener('firebaseReady', initAuth, { once: true });
+                }
             }, []);
 
             const impersonateUser = (targetUser) => {
