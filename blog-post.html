@@ -32,7 +32,16 @@
                 }
             },
             plugins: [
-                require('@tailwindcss/typography'),
+                function({ addComponents }) {
+                    addComponents({
+                        '.prose': {
+                            'h1, h2, h3, h4, h5, h6': { fontWeight: '800' },
+                            'p, li': { lineHeight: '1.8' },
+                             'a': { color: '#C69C6D', textDecoration: 'none' },
+                            'a:hover': { textDecoration: 'underline' },
+                        }
+                    })
+                }
             ],
         }
     </script>
@@ -117,30 +126,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <!-- Modals (Copied from other pages for consistency) -->
     
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAgxIJYhMQB_2n_CbQ47uhnU8lBE2ji5J8",
-            authDomain: "truedraftcrm.firebaseapp.com",
-            databaseURL: "https://truedraftcrm-default-rtdb.firebaseio.com",
-            projectId: "truedraftcrm",
-            storageBucket: "truedraftcrm.appspot.com",
-            messagingSenderId: "920547055600",
-            appId: "1:920547055600:web:c74f7de68ca8ae35852f35"
-        };
-
-        try {
-            const app = initializeApp(firebaseConfig);
-            const db = getDatabase(app);
-            window.db = { app, db, ref, onValue, query, orderByChild, equalTo, get };
-            document.dispatchEvent(new Event('firebaseReady'));
-        } catch (error) {
-            console.error("Firebase Init Error:", error);
-            document.getElementById('post-loader').innerText = 'خطأ في الاتصال.';
-        }
-    </script>
+    <script src="js/blog-data.js"></script>
     <script>
         let currentLang = localStorage.getItem('lang') || 'ar';
         const translations = {
@@ -190,39 +176,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <h1 class="text-4xl md:text-5xl font-extrabold my-3 leading-tight">${title}</h1>
                     <p class="text-gray-400 font-mono text-sm">${date}</p>
                 </div>
-                <img src="${post.imageUrl}" alt="${title}" class="w-full aspect-video object-cover rounded-lg shadow-xl mb-12">
+                <img src="${post.imageUrl}" alt="${title}" class="w-full aspect-video object-cover rounded-lg shadow-xl mb-12" onerror="this.style.display='none'">
                 <div class="prose lg:prose-xl max-w-none text-gray-800">${contentHtml}</div>
             `;
+            const backLink = container.querySelector('[data-i18n="back_to_blog"]');
+            backLink.textContent = currentLang === 'ar' ? '← العودة للمدونة' : '← Back to Blog';
         }
 
-        async function loadPost() {
+        function loadPost() {
             const params = new URLSearchParams(window.location.search);
             const slug = params.get('slug');
             if (!slug) {
                 document.getElementById('post-loader').textContent = 'لم يتم العثور على المقال.';
                 return;
             }
-
-            const { db, ref, query, orderByChild, equalTo, get } = window.db;
-            const postsRef = ref(db, 'blogPosts');
-            const postQuery = query(postsRef, orderByChild('slug'), equalTo(slug));
             
-            try {
-                const snapshot = await get(postQuery);
-                if (snapshot.exists()) {
-                    const postData = Object.values(snapshot.val())[0];
+            if (window.blogPosts) {
+                const postData = window.blogPosts.find(p => p.slug === slug);
+                if (postData) {
                     applyLanguage(postData);
                 } else {
                     document.getElementById('post-loader').textContent = 'لم يتم العثور على المقال.';
                 }
-            } catch(e) {
-                console.error("Error fetching post: ", e);
-                document.getElementById('post-loader').textContent = 'حدث خطأ أثناء تحميل المقال.';
+            } else {
+                 document.getElementById('post-loader').textContent = 'خطأ في تحميل بيانات المدونة.';
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-             document.addEventListener('firebaseReady', loadPost);
+             applyLanguage();
+             loadPost();
         });
     </script>
 </body>
