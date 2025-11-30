@@ -247,7 +247,7 @@
             );
         };
 
-        const UserManagement = ({ users, onAddUser, onUpdatePermissions, onUpdateUserDetails, onImpersonate }) => {
+        const UserManagement = ({ users, onAddUser, onUpdatePermissions, onUpdateUserDetails, onImpersonate, onDeleteUser }) => {
             const [isAddModalOpen, setAddModalOpen] = useState(false);
             const [editingUser, setEditingUser] = useState(null);
 
@@ -288,6 +288,9 @@
                                                     <button onClick={() => onImpersonate(u)} className="px-3 py-1.5 text-sm rounded-md bg-gray-100 hover:bg-gray-200 font-bold flex items-center gap-1.5">
                                                         <Icon name="KeyRound" size={14}/> الدخول كـ
                                                     </button>
+                                                    <button onClick={() => onDeleteUser(u.id, u.name)} className="px-3 py-1.5 text-sm rounded-md bg-red-50 text-red-600 hover:bg-red-100 font-bold flex items-center gap-1.5">
+                                                        <Icon name="Trash2" size={14}/> حذف
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -303,7 +306,7 @@
             );
         };
         
-        const Dashboard = () => {
+        const Dashboard = ({ user }) => {
             const Card = ({ title, desc, icon, href }) => (
                 <a href={href} className="bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-6 hover:shadow-lg hover:border-black hover:-translate-y-1 transition-all duration-300 group">
                     <div className="p-4 rounded-xl bg-slate-100 group-hover:bg-black transition-colors duration-300">
@@ -316,12 +319,28 @@
                 </a>
             );
 
+            const allModules = [
+                { key: 'crm', title: 'إدارة العملاء (CRM)', desc: 'نظام متكامل لإدارة العملاء، الصفقات، والملاحظات', icon: 'Grid', href: 'crm.html' },
+                { key: 'blog', title: 'إدارة المدونة', desc: 'إدارة وإنشاء مقالات للموقع العام', icon: 'FileText', href: 'blog-editor.html' },
+            ];
+
+            const availableModules = allModules.filter(module => {
+                if (!user) return false;
+                if (user.role === 'admin') return true;
+                return user.permissions && user.permissions[module.key] && user.permissions[module.key] !== 'none';
+            });
+
             return (
                 <div className="max-w-4xl mx-auto animate-fade-in">
                     <h2 className="text-2xl font-bold mb-6">الوصول السريع</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Card title="إدارة العملاء (CRM)" desc="نظام متكامل لإدارة العملاء، الصفقات، والملاحظات" icon="Grid" href="crm.html" />
-                        <Card title="إدارة المدونة" desc="إدارة وإنشاء مقالات للموقع العام" icon="FileText" href="blog-editor.html" />
+                        {availableModules.length > 0 ? (
+                            availableModules.map(m => <Card key={m.key} title={m.title} desc={m.desc} icon={m.icon} href={m.href} />)
+                        ) : (
+                            <div className="md:col-span-2 text-center bg-white p-10 rounded-2xl border">
+                                <p className="text-gray-500">ليس لديك صلاحية للوصول إلى أي نظام حالياً. يرجى التواصل مع المدير.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
@@ -379,21 +398,33 @@
             const [originalAdminUser, setOriginalAdminUser] = useState(null);
 
             useEffect(() => {
-                const handleHashChange = () => setRoute(window.location.hash || '#home');
+                const handleHashChange = () => {
+                    const newHash = window.location.hash || '#home';
+                    // Redirect non-admins trying to access #users away from it
+                    if (newHash === '#users' && user && user.role !== 'admin') {
+                        window.location.hash = '#home';
+                        setRoute('#home');
+                    } else {
+                        setRoute(newHash);
+                    }
+                };
+
                 window.addEventListener('hashchange', handleHashChange);
+                handleHashChange(); // Initial call to set route correctly
+
                 const storedAdmin = sessionStorage.getItem('originalAdminUser');
                 if (storedAdmin) {
                     setOriginalAdminUser(JSON.parse(storedAdmin));
                 }
                 return () => window.removeEventListener('hashchange', handleHashChange);
-            }, []);
+            }, [user]); // Re-run this effect if the user object changes
             
             useEffect(() => {
+                // This effect runs on every render and ensures icons are drawn.
                 if (window.lucide) {
                     window.lucide.createIcons();
                 }
-            }, [route]);
-
+            });
 
             useEffect(() => {
                 const initAuth = () => {
@@ -414,7 +445,7 @@
                                 }
 
                                 if (!currentUser) {
-                                    setUser({ name: u.email.split('@')[0], email: u.email, role: 'employee' });
+                                    setUser({ name: u.email.split('@')[0], email: u.email, role: 'employee', permissions: {} });
                                     setLoading(false);
                                     return;
                                 }
@@ -482,6 +513,14 @@
                  alert('تمت إضافة الموظف بنجاح.');
             };
 
+            const deleteUser = (userId, userName) => {
+                if (confirm(`هل أنت متأكد من حذف الموظف "${userName}"؟ سيتم حذف بياناته وصلاحياته نهائياً.`)) {
+                    window.dbRemove(window.dbRef(window.db, `users/${userId}`))
+                        .then(() => alert('تم حذف الموظف بنجاح.'))
+                        .catch((err) => alert('حدث خطأ أثناء الحذف: ' + err.message));
+                }
+            };
+
             const updatePermissions = (userId, permissions) => {
                 window.dbUpdate(window.dbRef(window.db, `users/${userId}/permissions`), permissions);
                 alert('تم تحديث الصلاحيات.');
@@ -498,13 +537,10 @@
             };
 
             const renderPage = () => {
-                switch(route) {
-                    case '#home': return <Dashboard />;
-                    case '#users': return (user.role === 'admin' && !originalAdminUser) ? <UserManagement users={users} onAddUser={addUser} onUpdatePermissions={updatePermissions} onUpdateUserDetails={updateUserDetails} onImpersonate={impersonateUser}/> : <Dashboard />;
-                    default: 
-                        window.location.hash = '#home';
-                        return <Dashboard />;
+                if (route === '#users' && user.role === 'admin' && !originalAdminUser) {
+                    return <UserManagement users={users} onAddUser={addUser} onUpdatePermissions={updatePermissions} onUpdateUserDetails={updateUserDetails} onImpersonate={impersonateUser} onDeleteUser={deleteUser} />;
                 }
+                return <Dashboard user={user} />;
             };
             
             if (loading) return null;
