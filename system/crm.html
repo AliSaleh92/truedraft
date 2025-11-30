@@ -84,7 +84,7 @@
     </script>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo, useRef } = React;
+        const { useState, useEffect, useMemo, useRef, useCallback } = React;
         
         const playAssignSound = (assignedName) => {
             if (!assignedName) return;
@@ -115,7 +115,9 @@
             Phone: "phone", CheckSquare: "check-square", XCircle: "x-circle",
             Save: "save", MessageCircle: "message-circle", AlertCircle: "alert-circle", 
             FileSpreadsheet: "file-spreadsheet", Square: "square",
-            LogOut: "log-out", LayoutDashboard: "layout-dashboard"
+            LogOut: "log-out", LayoutDashboard: "layout-dashboard", Users: "users",
+            Briefcase: "briefcase", FileText: "file-text", Clock: "clock", Megaphone: "megaphone",
+            User: "user", Folder: "folder", Package: "package", Calendar: "calendar"
         };
 
         const Icon = ({ name, size = 20, className = "" }) => {
@@ -192,32 +194,160 @@
             );
         };
         
-        const Header = ({ user }) => {
-            return (
-                <header className="bg-white h-20 border-b flex items-center justify-between px-6 shrink-0 shadow-sm z-10">
-                    <div className="flex items-center gap-4">
-                        <a href="erp.html#home" className="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-200 transition">
-                            <Icon name="LayoutDashboard" size={18} /> لوحة التحكم
-                        </a>
+        const Header = ({ user, onLogout }) => (
+            <header className="bg-white h-20 border-b flex items-center justify-between px-6 shrink-0 shadow-sm z-10 sticky top-0">
+                <div className="flex items-center gap-4">
+                    <a href="erp.html#home" className="text-gray-800 px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-100 transition">
+                        <Icon name="LayoutDashboard" size={18} /> لوحة التحكم الرئيسية
+                    </a>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="text-right">
+                        <div className="font-bold flex items-center gap-2 justify-end text-lg">
+                            مرحباً, {user.name} 👋
+                        </div>
+                        <div className="text-xs text-gray-500 font-bold uppercase tracking-wider text-right">
+                           نظام إدارة علاقات العملاء
+                        </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <div className="text-right">
-                            <div className="font-bold flex items-center gap-2 justify-end">
-                                <span className="text-2xl">👋</span> مرحباً, {user.name}
-                            </div>
-                            <div className="text-xs text-gray-500 font-bold uppercase tracking-wider text-right">
-                                نظام إدارة العملاء
+                    <button onClick={onLogout} className="bg-red-50 text-red-600 px-3 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-red-100 transition">
+                        <Icon name="LogOut" size={18} />
+                    </button>
+                </div>
+            </header>
+        );
+
+        const Dashboard = ({ clients, users, currentUser }) => {
+            const stats = useMemo(() => {
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+                const newClientsCount = clients.filter(c => new Date(c.dateAdded) > thirtyDaysAgo).length;
+                const signedContractsCount = clients.filter(c => c.status === 'Contract').length;
+                
+                const statusCounts = STATUS_LIST.reduce((acc, status) => {
+                    acc[status.key] = clients.filter(c => c.status === status.key).length;
+                    return acc;
+                }, {});
+
+                const sourceCounts = clients.reduce((acc, c) => {
+                    const source = c.source || "غير محدد";
+                    acc[source] = (acc[source] || 0) + 1;
+                    return acc;
+                }, {});
+                const sortedSources = Object.entries(sourceCounts).sort(([,a],[,b]) => b-a);
+
+                return { newClientsCount, signedContractsCount, statusCounts, sortedSources };
+            }, [clients]);
+
+            const tasks = useMemo(() => {
+                const getPendingTasks = (client) => {
+                    if (!client.tasks) return 0;
+                    return Object.values(client.tasks).filter(task => !task.completed).length;
+                };
+
+                if (currentUser.role === 'admin' || currentUser.permissions?.crm === 'supervisor') {
+                    // Admin/Supervisor view: tasks per user
+                    const userTasks = users.reduce((acc, user) => {
+                        acc[user.name] = 0;
+                        return acc;
+                    }, {});
+
+                    clients.forEach(client => {
+                        if (client.assignedTo && userTasks.hasOwnProperty(client.assignedTo)) {
+                            userTasks[client.assignedTo] += getPendingTasks(client);
+                        }
+                    });
+                    return { type: 'team', data: Object.entries(userTasks).filter(([,count]) => count > 0) };
+                } else {
+                    // Employee view: only their tasks
+                    const myTasksCount = clients
+                        .filter(c => c.assignedTo === currentUser.name)
+                        .reduce((total, client) => total + getPendingTasks(client), 0);
+                    return { type: 'user', data: myTasksCount };
+                }
+            }, [clients, users, currentUser]);
+
+            const StatCard = ({ title, value, icon, color }) => (
+                <div className={`bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-5 ${value > 0 ? '' : 'opacity-60'}`}>
+                    <div className={`p-4 rounded-xl ${color}`}>
+                        <Icon name={icon} className="text-black" size={28} />
+                    </div>
+                    <div>
+                        <h4 className="text-gray-500 font-bold">{title}</h4>
+                        <p className="text-4xl font-extrabold text-black">{value}</p>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="space-y-8 animate-fade-in">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <StatCard title="إجمالي العملاء" value={clients.length} icon="Users" color="bg-gray-200" />
+                        <StatCard title="عملاء جدد (30 يوم)" value={stats.newClientsCount} icon="User" color="bg-yellow-200" />
+                        <StatCard title="عقود موقعة" value={stats.signedContractsCount} icon="FileText" color="bg-green-200" />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border">
+                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Icon name="Package" size={18}/> تفاصيل الحالات</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {STATUS_LIST.map(s => {
+                                    const count = stats.statusCounts[s.key] || 0;
+                                    return (
+                                        <div key={s.key} className={`p-4 rounded-lg ${count > 0 ? s.color.replace('100', '200').replace('text-', 'font-bold text-') : 'bg-gray-100 text-gray-400'}`}>
+                                            <p className="font-bold text-sm">{s.label}</p>
+                                            <p className="text-2xl font-extrabold">{count}</p>
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
-                        <button onClick={() => window.authSignOut(window.auth)} className="bg-red-50 text-red-600 px-3 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-red-100 transition">
-                            <Icon name="LogOut" size={18} />
-                        </button>
+                        <div className="space-y-6">
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border">
+                                <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Icon name="Megaphone" size={18}/> مصادر العملاء</h3>
+                                <div className="space-y-3">
+                                    {stats.sortedSources.map(([source, count]) => {
+                                        const percentage = (count / clients.length) * 100;
+                                        return (
+                                            <div key={source}>
+                                                <div className="flex justify-between text-sm mb-1">
+                                                    <span className="font-bold">{source}</span>
+                                                    <span className="text-gray-500">{count} ({Math.round(percentage)}%)</span>
+                                                </div>
+                                                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                                    <div className="bg-black h-2.5 rounded-full" style={{width: `${percentage}%`}}></div>
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border">
+                                <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Icon name="Calendar" size={18}/> المهام المعلقة</h3>
+                                {tasks.type === 'user' ? (
+                                    <div>
+                                        <p className="text-gray-500">لديك</p>
+                                        <p className="text-4xl font-extrabold">{tasks.data} <span className="text-xl">مهام</span></p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {tasks.data.length > 0 ? tasks.data.map(([name, count]) => (
+                                            <div key={name} className="flex justify-between items-center bg-gray-50 p-2 rounded-md">
+                                                <span className="font-bold">{name}</span>
+                                                <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{count}</span>
+                                            </div>
+                                        )) : <p className="text-gray-400 text-center py-4">لا توجد مهام معلقة للفريق.</p>}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                </header>
+                </div>
             );
         };
 
-        const Clients = ({ clients, users, user }) => {
+        const ClientList = ({ clients, users, user, onClientUpdate }) => {
             const [search, setSearch] = useState('');
             const [statusFilter, setStatusFilter] = useState('');
             const [assignFilter, setAssignFilter] = useState('');
@@ -235,12 +365,17 @@
 
             const updateClient = (id, data) => {
                 window.dbUpdate(window.dbRef(window.db, `clients/${id}`), data);
+                onClientUpdate();
             };
 
             const deleteClient = (id) => {
-                if(confirm('حذف العميل نهائياً؟')) window.dbRemove(window.dbRef(window.db, `clients/${id}`));
+                if (user.role !== 'admin' && user.permissions?.crm !== 'supervisor') return;
+                if(confirm('حذف العميل نهائياً؟')) {
+                    window.dbRemove(window.dbRef(window.db, `clients/${id}`));
+                    onClientUpdate();
+                }
             };
-
+            
             const addNote = (id, text) => {
                 const notesRef = window.dbRef(window.db, `clients/${id}/notes`);
                 const newNoteRef = window.dbPush(notesRef);
@@ -269,46 +404,33 @@
                     const status = getStatusInfo(c.status).label;
                     const notesCount = c.notes ? Object.keys(c.notes).length : 0;
                     return {
-                        'اسم العميل': c.name,
-                        'رقم الجوال': c.phone,
-                        'نوع المشروع': c.projectType,
-                        'نوع الخدمة': c.serviceType,
-                        'الحالة': status,
-                        'مسند إلى': c.assignedTo || 'غير مسند',
-                        'المصدر': c.source || 'غير محدد',
-                        'تاريخ الإضافة': new Date(c.dateAdded).toLocaleDateString('en-GB'),
-                        'أضيف بواسطة': c.addedBy,
-                        'عدد الملاحظات': notesCount,
-                        'رابط Drive': c.driveLink
+                        'اسم العميل': c.name, 'رقم الجوال': c.phone, 'نوع المشروع': c.projectType, 'نوع الخدمة': c.serviceType,
+                        'الحالة': status, 'مسند إلى': c.assignedTo || 'غير مسند', 'المصدر': c.source || 'غير محدد',
+                        'تاريخ الإضافة': new Date(c.dateAdded).toLocaleDateString('en-GB'), 'أضيف بواسطة': c.addedBy,
+                        'عدد الملاحظات': notesCount, 'رابط Drive': c.driveLink
                     };
                 });
-
                 const ws = XLSX.utils.json_to_sheet(data);
-                const wscols = [
-                    {wch:20}, {wch:15}, {wch:15}, {wch:15}, {wch:15}, {wch:15}, {wch:15}, {wch:15}, {wch:15}, {wch:10}, {wch:30}
-                ];
-                ws['!cols'] = wscols;
-
+                ws['!cols'] = [ {wch:20}, {wch:15}, {wch:15}, {wch:15}, {wch:15}, {wch:15}, {wch:15}, {wch:15}, {wch:15}, {wch:10}, {wch:30} ];
                 const wb = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(wb, ws, "العملاء");
                 XLSX.writeFile(wb, `TrueDraft_Clients_${new Date().toISOString().slice(0,10)}.xlsx`);
             };
 
-            const filtered = clients.filter(c => {
+            const filteredClients = useMemo(() => clients.filter(c => {
                 const matchSearch = c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search);
                 const matchStatus = statusFilter ? c.status === statusFilter : true;
                 const matchAssign = assignFilter ? c.assignedTo === assignFilter : true;
                 return matchSearch && matchStatus && matchAssign;
-            });
+            }), [clients, search, statusFilter, assignFilter]);
 
             const editingClient = clients.find(c => c.id === editId);
 
             return (
                 <div className="space-y-6 animate-fade-in">
-                    <div className="flex flex-col md:flex-row justify-between gap-4">
-                        <h2 className="text-2xl font-bold">إدارة العملاء</h2>
+                    <div className="flex flex-col md:flex-row justify-end gap-4">
                         <div className="flex gap-2">
-                            {user.role === 'admin' && (
+                             {(user.role === 'admin' || user.permissions?.crm === 'supervisor') && (
                                 <button onClick={exportExcel} className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-bold hover:bg-green-700 transition shadow-lg">
                                     <Icon name="FileSpreadsheet" size={18} /> تصدير Excel
                                 </button>
@@ -340,19 +462,14 @@
                             <table className="w-full text-right text-sm">
                                 <thead className="bg-gray-50 text-gray-500 font-bold border-b">
                                     <tr>
-                                        <th className="p-4">الاسم / الجوال</th>
-                                        <th className="p-4">التفاصيل</th>
-                                        <th className="p-4">الحالة</th>
-                                        <th className="p-4">مسند إلى</th>
-                                        <th className="p-4">تاريخ الإنشاء</th>
-                                        <th className="p-4">آخر تحديث</th>
-                                        <th className="p-4">إجراءات</th>
+                                        <th className="p-4">الاسم / الجوال</th><th className="p-4">التفاصيل</th><th className="p-4">الحالة</th>
+                                        <th className="p-4">مسند إلى</th><th className="p-4">تاريخ الإنشاء</th><th className="p-4">آخر تحديث</th><th className="p-4">إجراءات</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
-                                    {filtered.map(c => {
+                                    {filteredClients.map(c => {
                                         const statusInfo = getStatusInfo(c.status);
-                                        const lastNoteTimestamp = c.notes && Object.keys(c.notes).length > 0 ? Object.values(c.notes).pop().timestamp : null;
+                                        const lastNoteTimestamp = c.notes && Object.keys(c.notes).length > 0 ? Object.values(c.notes).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0].timestamp : null;
                                         const lastActivity = lastNoteTimestamp || c.dateAdded;
                                         const daysInactive = (new Date() - new Date(lastActivity)) / (1000 * 60 * 60 * 24);
                                         const isForgotten = daysInactive > 7 && c.status !== 'Completed' && c.status !== 'Lost';
@@ -363,9 +480,7 @@
                                                     <div className="font-bold text-base">{c.name}</div>
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <span className="text-gray-400 text-xs date-en">{c.phone}</span>
-                                                        <button onClick={() => openWhatsApp(c.phone)} className="text-green-500 hover:text-green-600 hover:bg-green-50 rounded-full p-1 transition" title="فتح واتساب">
-                                                            <Icon name="MessageCircle" size={16} />
-                                                        </button>
+                                                        <button onClick={() => openWhatsApp(c.phone)} className="text-green-500 hover:text-green-600 hover:bg-green-50 rounded-full p-1 transition" title="فتح واتساب"><Icon name="MessageCircle" size={16} /></button>
                                                     </div>
                                                 </td>
                                                 <td className="p-4 text-gray-600">
@@ -373,33 +488,18 @@
                                                     <div className="text-xs text-gray-400">{c.serviceType}</div>
                                                     <div className="text-[10px] text-gray-400 mt-0.5">{c.source || 'غير محدد'}</div>
                                                 </td>
-                                                <td className="p-4">
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusInfo.color}`}>
-                                                        {statusInfo.label}
-                                                    </span>
-                                                </td>
-                                                <td className="p-4">
-                                                    {c.assignedTo ? <div className="flex items-center gap-1 text-gray-700"><Icon name="UserCheck" size={14}/> {c.assignedTo}</div> : <span className="text-gray-300">-</span>}
-                                                </td>
-                                                <td className="p-4 text-xs text-gray-500">
-                                                    {formatDate(c.dateAdded)}
-                                                </td>
+                                                <td className="p-4"><span className={`px-3 py-1 rounded-full text-xs font-bold ${statusInfo.color}`}>{statusInfo.label}</span></td>
+                                                <td className="p-4">{c.assignedTo ? <div className="flex items-center gap-1 text-gray-700"><Icon name="UserCheck" size={14}/> {c.assignedTo}</div> : <span className="text-gray-300">-</span>}</td>
+                                                <td className="p-4 text-xs text-gray-500">{formatDate(c.dateAdded)}</td>
                                                 <td className="p-4 text-xs">
-                                                    <div className={isForgotten ? "text-red-600 font-bold" : "text-gray-500"}>
-                                                        {formatDate(lastActivity)}
-                                                    </div>
-                                                    {isForgotten && (
-                                                        <div className="flex items-center gap-1 text-red-500 text-[10px] font-bold mt-1">
-                                                            <Icon name="AlertCircle" size={12} />
-                                                            <span>منذ {Math.floor(daysInactive)} يوم</span>
-                                                        </div>
-                                                    )}
+                                                    <div className={isForgotten ? "text-red-600 font-bold" : "text-gray-500"}>{formatDate(lastActivity)}</div>
+                                                    {isForgotten && <div className="flex items-center gap-1 text-red-500 text-[10px] font-bold mt-1"><Icon name="AlertCircle" size={12} /><span>منذ {Math.floor(daysInactive)} يوم</span></div>}
                                                 </td>
                                                 <td className="p-4">
                                                     <div className="flex gap-2">
                                                         <button onClick={()=>setEditId(c.id)} className="text-blue-500 hover:bg-blue-50 p-2 rounded border border-transparent hover:border-blue-100 transition"><Icon name="Edit2" size={16}/></button>
                                                         {c.driveLink && <a href={c.driveLink} target="_blank" className="text-gray-500 hover:bg-gray-50 p-2 rounded border border-transparent hover:border-gray-200 transition"><Icon name="Link" size={16}/></a>}
-                                                        <button onClick={()=>deleteClient(c.id)} className="text-red-400 hover:bg-red-50 p-2 rounded border border-transparent hover:border-red-100 transition"><Icon name="Trash2" size={16}/></button>
+                                                        {(user.role === 'admin' || user.permissions?.crm === 'supervisor') && <button onClick={()=>deleteClient(c.id)} className="text-red-400 hover:bg-red-50 p-2 rounded border border-transparent hover:border-red-100 transition"><Icon name="Trash2" size={16}/></button>}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -409,207 +509,8 @@
                             </table>
                         </div>
                     </div>
-
                     {addOpen && <AddModal onClose={()=>setAddOpen(false)} onAdd={addClient} users={users} />}
                     {editingClient && <EditModal c={editingClient} onClose={()=>setEditId(null)} onUpdate={updateClient} onNote={addNote} onAddTask={addTask} onToggleTask={toggleTask} onDeleteTask={deleteTask} users={users} user={user} />}
-                </div>
-            );
-        };
-
-        const AddModal = ({ onClose, onAdd, users }) => {
-            const [d, setD] = useState({ name: '', phone: '', projectType: 'سكني', serviceType: 'تصميم', status: 'New', driveLink: '', assignedTo: '', source: '' });
-            return (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-                    <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
-                        <div className="flex justify-between items-center mb-6 border-b pb-4">
-                            <h3 className="text-xl font-bold">إضافة عميل جديد</h3>
-                            <button onClick={onClose}><Icon name="X" /></button>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div><label className="text-sm font-bold mb-1 block">الاسم</label><input required className="w-full border p-2 rounded outline-none focus:border-black" value={d.name} onChange={e=>setD({...d, name:e.target.value})} /></div>
-                                <div><label className="text-sm font-bold mb-1 block">رقم الجوال</label><input required className="w-full border p-2 rounded outline-none focus:border-black date-en" placeholder="05xxxxxxxx" value={d.phone} onChange={e=>setD({...d, phone:e.target.value})} /></div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-sm font-bold mb-1 block">نوع المشروع</label>
-                                    <select className="w-full border p-2 rounded outline-none bg-white" value={d.projectType} onChange={e=>setD({...d, projectType:e.target.value})}>
-                                        {PROJECT_TYPES.map(t=><option key={t} value={t}>{t}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-sm font-bold mb-1 block">الخدمة</label>
-                                    <select className="w-full border p-2 rounded outline-none bg-white" value={d.serviceType} onChange={e=>setD({...d, serviceType:e.target.value})}>
-                                        {SERVICE_TYPES.map(t=><option key={t} value={t}>{t}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-sm font-bold mb-1 block">إسناد إلى</label>
-                                    <select className="w-full border p-2 rounded outline-none bg-white" value={d.assignedTo} onChange={e=>setD({...d, assignedTo:e.target.value})}>
-                                        <option value="">بدون إسناد</option>
-                                        {users.map(u=><option key={u.id} value={u.name}>{u.name}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-sm font-bold mb-1 block">المصدر</label>
-                                    <select className="w-full border p-2 rounded outline-none bg-white" value={d.source} onChange={e=>setD({...d, source:e.target.value})}>
-                                        <option value="">اختر المصدر</option>
-                                        {CLIENT_SOURCES.map(s=><option key={s} value={s}>{s}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <label className="text-sm font-bold mb-1 block">رابط DRIVE</label>
-                                <input className="w-full border p-2 rounded outline-none focus:border-black text-left dir-ltr" placeholder="https://" value={d.driveLink} onChange={e=>setD({...d, driveLink:e.target.value})} />
-                            </div>
-                            <button onClick={() => { if(d.name && d.phone) onAdd(d); }} className="w-full bg-black text-white py-3 rounded-lg font-bold mt-4 hover:bg-gray-800 transition">حفظ العميل</button>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const EditModal = ({ c, onClose, onUpdate, users, user, onNote, onAddTask, onToggleTask, onDeleteTask }) => {
-            const [d, setD] = useState({ ...c });
-            const [note, setNote] = useState('');
-            const [tab, setTab] = useState('chat');
-            const [newTask, setNewTask] = useState('');
-            const chatContainer = useRef(null);
-            
-            useEffect(() => { 
-                setD(c); 
-                setTimeout(() => {
-                    if (chatContainer.current) chatContainer.current.scrollTop = chatContainer.current.scrollHeight;
-                }, 100);
-            }, [c]);
-
-            const saveAndClose = () => { 
-                if (d.assignedTo && d.assignedTo !== c.assignedTo) {
-                    playAssignSound(d.assignedTo);
-                }
-                onUpdate(c.id, d); 
-                onClose(); 
-            };
-            const send = (e) => { e.preventDefault(); if(note.trim()) { onNote(c.id, note); setNote(''); } };
-            const submitTask = (e) => { e.preventDefault(); if(newTask.trim()) { onAddTask(c.id, newTask); setNewTask(''); } };
-            const linkify = (text) => { const urlRegex = /(https?:\/\/[^\s]+)/g; return text.split(urlRegex).map((part, i) => part.match(urlRegex) ? <a key={i} href={part} target="_blank" className="text-blue-600 underline break-all">{part}</a> : part); };
-            
-            const pendingTasks = c.tasks ? Object.values(c.tasks).filter(t => !t.completed).length : 0;
-
-            return (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-                    <div className="bg-white w-full max-w-5xl h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
-                        <div className="w-full md:w-1/3 bg-gray-50 p-6 border-l flex flex-col overflow-y-auto">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="font-bold text-lg">تعديل البيانات</h3>
-                                <button onClick={onClose} className="md:hidden"><Icon name="X" /></button>
-                            </div>
-                            <div className="space-y-4 flex-1">
-                                <div><label className="text-xs font-bold text-gray-500">الاسم</label><input className="w-full bg-white border p-2 rounded mt-1" value={d.name} onChange={e=>setD({...d, name:e.target.value})} /></div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500 flex justify-between">الجوال 
-                                        <button onClick={() => openWhatsApp(d.phone)} className="text-green-600 text-[10px] flex items-center gap-1"><Icon name="MessageCircle" size={10}/> واتساب</button>
-                                    </label>
-                                    <input className="w-full bg-white border p-2 rounded mt-1 date-en" value={d.phone} onChange={e=>setD({...d, phone:e.target.value})} />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500">المشروع</label>
-                                    <select className="w-full bg-white border p-2 rounded mt-1" value={d.projectType} onChange={e=>setD({...d, projectType:e.target.value})}>
-                                        {PROJECT_TYPES.map(t=><option key={t} value={t}>{t}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500">الخدمة</label>
-                                    <select className="w-full bg-white border p-2 rounded mt-1" value={d.serviceType} onChange={e=>setD({...d, serviceType:e.target.value})}>
-                                        {SERVICE_TYPES.map(t=><option key={t} value={t}>{t}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500">الحالة</label>
-                                    <select className="w-full bg-white border p-2 rounded mt-1" value={d.status} onChange={e=>setD({...d, status:e.target.value})}>
-                                        {STATUS_LIST.map(s=><option key={s.key} value={s.key}>{s.label}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500">مسند إلى</label>
-                                    <select className="w-full bg-white border p-2 rounded mt-1" value={d.assignedTo} onChange={e=>setD({...d, assignedTo:e.target.value})}>
-                                        <option value="">بدون إسناد</option>
-                                        {users.map(u=><option key={u.id} value={u.name}>{u.name}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500">المصدر</label>
-                                    <select className="w-full bg-white border p-2 rounded mt-1" value={d.source || ''} onChange={e=>setD({...d, source:e.target.value})}>
-                                        <option value="">اختر المصدر</option>
-                                        {CLIENT_SOURCES.map(s=><option key={s} value={s}>{s}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500 flex justify-between">رابط Drive {d.driveLink && <a href={d.driveLink} target="_blank" className="text-blue-600"><Icon name="ExternalLink" size={12}/></a>}</label>
-                                    <input className="w-full bg-white border p-2 rounded mt-1 text-left dir-ltr" value={d.driveLink} onChange={e=>setD({...d, driveLink:e.target.value})} />
-                                </div>
-                            </div>
-                            <div className="mt-6 pt-4 border-t space-y-2">
-                                <button onClick={saveAndClose} className="w-full bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700 flex items-center justify-center gap-2"><Icon name="Save" size={16} /> حفظ وإغلاق</button>
-                                <button onClick={onClose} className="w-full bg-gray-200 text-gray-800 py-2 rounded font-bold hover:bg-gray-300">إغلاق</button>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 bg-white flex flex-col h-full">
-                            <div className="p-4 border-b flex justify-between items-center bg-gray-50">
-                                <div className="flex gap-6">
-                                    <button onClick={()=>setTab('chat')} className={`pb-1 ${tab==='chat'?'font-bold border-b-2 border-black text-black':'text-gray-400'}`}>الملاحظات</button>
-                                    <button onClick={()=>setTab('tasks')} className={`pb-1 flex items-center gap-2 ${tab==='tasks'?'font-bold border-b-2 border-black text-black':'text-gray-400'}`}>
-                                        المهام 
-                                        {pendingTasks > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{pendingTasks}</span>}
-                                    </button>
-                                </div>
-                                <button onClick={onClose} className="hidden md:block"><Icon name="X" /></button>
-                            </div>
-                            
-                            {tab === 'chat' ? (
-                                <>
-                                    <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#f8f9fa]" ref={chatContainer}>
-                                        {c.notes ? Object.values(c.notes).map((n, i) => (
-                                            <div key={i} className={`flex flex-col ${n.author === (user.name || user.email) ? 'items-start' : 'items-end'}`}>
-                                                <div className={`max-w-[80%] p-3 rounded-xl text-sm ${n.author === (user.name || user.email) ? 'bg-white border rounded-tr-none' : 'bg-blue-50 rounded-tl-none'}`}>
-                                                    <div className="flex justify-between gap-4 mb-1 text-[10px] text-gray-400 border-b pb-1">
-                                                        <span className="font-bold text-gray-600">{n.author}</span>
-                                                        <span>{formatDate(n.timestamp)}</span>
-                                                    </div>
-                                                    <p className="whitespace-pre-wrap leading-relaxed">{linkify(n.text)}</p>
-                                                </div>
-                                            </div>
-                                        )) : <div className="text-center text-gray-400 mt-20">لا توجد ملاحظات</div>}
-                                    </div>
-                                    <form onSubmit={send} className="p-4 border-t flex gap-2">
-                                        <textarea className="flex-1 bg-gray-100 border-0 p-3 rounded-lg outline-none" placeholder="اكتب ملاحظة..." value={note} onChange={e=>setNote(e.target.value)} rows="1"></textarea>
-                                        <button disabled={!note.trim()} className="bg-black text-white p-3 rounded-lg hover:bg-gray-800"><Icon name="Send" className="rtl:rotate-180" /></button>
-                                    </form>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="flex-1 overflow-y-auto p-6 space-y-3">
-                                        {c.tasks ? Object.entries(c.tasks).map(([tid, t]) => (
-                                            <div key={tid} className="flex items-center gap-3 p-3 border rounded-xl hover:bg-gray-50 group transition">
-                                                <button onClick={()=>onToggleTask(c.id, tid, t.completed)} className={`text-gray-400 hover:text-black ${t.completed ? 'text-green-500' : ''}`}>
-                                                    <Icon name={t.completed ? "CheckSquare" : "Square"} />
-                                                </button>
-                                                <span className={`flex-1 text-sm ${t.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}>{t.text}</span>
-                                                <button onClick={()=>onDeleteTask(c.id, tid)} className="text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"><Icon name="Trash2" size={16}/></button>
-                                            </div>
-                                        )) : <div className="text-center text-gray-400 mt-20">لا توجد مهام</div>}
-                                    </div>
-                                    <form onSubmit={submitTask} className="p-4 border-t flex gap-2">
-                                        <input className="flex-1 bg-gray-100 border-0 p-3 rounded-lg outline-none" placeholder="أضف مهمة جديدة..." value={newTask} onChange={e=>setNewTask(e.target.value)} />
-                                        <button disabled={!newTask.trim()} className="bg-black text-white p-3 rounded-lg hover:bg-gray-800"><Icon name="Plus" /></button>
-                                    </form>
-                                </>
-                            )}
-                        </div>
-                    </div>
                 </div>
             );
         };
@@ -619,12 +520,26 @@
             const [loading, setLoading] = useState(true);
             const [clients, setClients] = useState([]);
             const [users, setUsers] = useState([]);
+            const [activeTab, setActiveTab] = useState('dashboard');
+
+            const fetchData = useCallback(() => {
+                if (!user) return;
+                
+                const dbClientsRef = window.dbRef(window.db, 'clients');
+                window.dbOnValue(dbClientsRef, (snapshot) => {
+                    const data = snapshot.val();
+                    let clientList = data ? Object.keys(data).map(k => ({ id: k, ...data[k] })) : [];
+                    
+                    if (user.role !== 'admin' && user.permissions?.crm !== 'supervisor') {
+                        clientList = clientList.filter(c => c.assignedTo === user.name || c.addedBy === user.name);
+                    }
+                    
+                    setClients(clientList.reverse());
+                });
+            }, [user]);
 
             useEffect(() => {
                 const initAuth = () => {
-                    const loader = document.getElementById('initial-loader');
-                    if (loader) loader.style.display = 'none';
-
                     window.authListener(window.auth, (u) => {
                         if (u) {
                             window.dbOnValue(window.dbRef(window.db, 'users'), (snap) => {
@@ -642,29 +557,24 @@
                                 } else {
                                     setUser({ name: u.email.split('@')[0], email: u.email, role: 'employee' }); // Fallback
                                 }
+                                setLoading(false);
+                                document.getElementById('initial-loader').style.display = 'none';
                             });
-
-                            window.dbOnValue(window.dbRef(window.db, 'clients'), (s) => {
-                                const d = s.val();
-                                setClients(d ? Object.keys(d).map(k => ({ id: k, ...d[k] })).reverse() : []);
-                            });
-                            setLoading(false);
                         } else {
                             setUser(null);
                             setLoading(false);
+                            document.getElementById('initial-loader').style.display = 'none';
                         }
                     });
                 };
-
-                if (window.db) {
-                    initAuth();
-                } else {
-                    document.addEventListener('firebaseReady', initAuth, { once: true });
-                }
-
-                return () => document.removeEventListener('firebaseReady', initAuth);
+                
+                document.addEventListener('firebaseReady', initAuth, { once: true });
             }, []);
             
+            useEffect(() => {
+                fetchData();
+            }, [fetchData]);
+
             useEffect(() => {
                 if(window.lucide) window.lucide.createIcons();
             });
@@ -672,12 +582,97 @@
             if (loading) return null;
             if (!user) return <Login />;
 
+            const handleLogout = () => {
+                window.authSignOut(window.auth).then(() => {
+                     window.location.href = 'erp.html';
+                });
+            };
+
             return (
                 <div className="flex flex-col min-h-screen">
-                    <Header user={user} />
-                    <main className="flex-1 overflow-y-auto p-6 md:p-8">
-                        <Clients clients={clients} users={users} user={user} />
+                    <Header user={user} onLogout={handleLogout} />
+                    <main className="flex-1 p-6 md:p-8">
+                        <div className="mb-6 border-b">
+                            <nav className="flex gap-6 -mb-px">
+                                <button onClick={() => setActiveTab('dashboard')} className={`px-1 py-3 text-lg font-bold ${activeTab === 'dashboard' ? 'border-b-2 border-black text-black' : 'text-gray-500'}`}>لوحة التحكم</button>
+                                <button onClick={() => setActiveTab('clients')} className={`px-1 py-3 text-lg font-bold ${activeTab === 'clients' ? 'border-b-2 border-black text-black' : 'text-gray-500'}`}>إدارة العملاء</button>
+                            </nav>
+                        </div>
+                        {activeTab === 'dashboard' && <Dashboard clients={clients} users={users} currentUser={user} />}
+                        {activeTab === 'clients' && <ClientList clients={clients} users={users} user={user} onClientUpdate={fetchData} />}
                     </main>
+                </div>
+            );
+        };
+        
+        const AddModal = ({ onClose, onAdd, users }) => {
+            const [d, setD] = useState({ name: '', phone: '', projectType: 'سكني', serviceType: 'تصميم', status: 'New', driveLink: '', assignedTo: '', source: '' });
+            return (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                    <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+                        <div className="flex justify-between items-center mb-6 border-b pb-4">
+                            <h3 className="text-xl font-bold">إضافة عميل جديد</h3><button onClick={onClose}><Icon name="X" /></button>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="text-sm font-bold mb-1 block">الاسم</label><input required className="w-full border p-2 rounded outline-none focus:border-black" value={d.name} onChange={e=>setD({...d, name:e.target.value})} /></div>
+                                <div><label className="text-sm font-bold mb-1 block">رقم الجوال</label><input required className="w-full border p-2 rounded outline-none focus:border-black date-en" placeholder="05xxxxxxxx" value={d.phone} onChange={e=>setD({...d, phone:e.target.value})} /></div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="text-sm font-bold mb-1 block">نوع المشروع</label><select className="w-full border p-2 rounded outline-none bg-white" value={d.projectType} onChange={e=>setD({...d, projectType:e.target.value})}>{PROJECT_TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
+                                <div><label className="text-sm font-bold mb-1 block">الخدمة</label><select className="w-full border p-2 rounded outline-none bg-white" value={d.serviceType} onChange={e=>setD({...d, serviceType:e.target.value})}>{SERVICE_TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="text-sm font-bold mb-1 block">إسناد إلى</label><select className="w-full border p-2 rounded outline-none bg-white" value={d.assignedTo} onChange={e=>setD({...d, assignedTo:e.target.value})}><option value="">بدون إسناد</option>{users.map(u=><option key={u.id} value={u.name}>{u.name}</option>)}</select></div>
+                                <div><label className="text-sm font-bold mb-1 block">المصدر</label><select className="w-full border p-2 rounded outline-none bg-white" value={d.source} onChange={e=>setD({...d, source:e.target.value})}><option value="">اختر المصدر</option>{CLIENT_SOURCES.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
+                            </div>
+                            <div><label className="text-sm font-bold mb-1 block">رابط DRIVE</label><input className="w-full border p-2 rounded outline-none focus:border-black text-left dir-ltr" placeholder="https://" value={d.driveLink} onChange={e=>setD({...d, driveLink:e.target.value})} /></div>
+                            <button onClick={() => { if(d.name && d.phone) onAdd(d); }} className="w-full bg-black text-white py-3 rounded-lg font-bold mt-4 hover:bg-gray-800 transition">حفظ العميل</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+        
+        const EditModal = ({ c, onClose, onUpdate, users, user, onNote, onAddTask, onToggleTask, onDeleteTask }) => {
+            const [d, setD] = useState({ ...c });
+            const [note, setNote] = useState('');
+            const [tab, setTab] = useState('chat');
+            const [newTask, setNewTask] = useState('');
+            const chatContainer = useRef(null);
+            
+            useEffect(() => { setD(c); setTimeout(() => { if (chatContainer.current) chatContainer.current.scrollTop = chatContainer.current.scrollHeight;}, 100); }, [c]);
+            const saveAndClose = () => { if (d.assignedTo && d.assignedTo !== c.assignedTo) { playAssignSound(d.assignedTo); } onUpdate(c.id, d); onClose(); };
+            const send = (e) => { e.preventDefault(); if(note.trim()) { onNote(c.id, note); setNote(''); } };
+            const submitTask = (e) => { e.preventDefault(); if(newTask.trim()) { onAddTask(c.id, newTask); setNewTask(''); } };
+            const linkify = (text) => { const urlRegex = /(https?:\/\/[^\s]+)/g; return text.split(urlRegex).map((part, i) => part.match(urlRegex) ? <a key={i} href={part} target="_blank" className="text-blue-600 underline break-all">{part}</a> : part); };
+            const pendingTasks = c.tasks ? Object.values(c.tasks).filter(t => !t.completed).length : 0;
+
+            return (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+                    <div className="bg-white w-full max-w-5xl h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+                        <div className="w-full md:w-1/3 bg-gray-50 p-6 border-l flex flex-col overflow-y-auto">
+                            <div className="flex justify-between items-center mb-6"><h3 className="font-bold text-lg">تعديل البيانات</h3><button onClick={onClose} className="md:hidden"><Icon name="X" /></button></div>
+                            <div className="space-y-4 flex-1">
+                                <div><label className="text-xs font-bold text-gray-500">الاسم</label><input className="w-full bg-white border p-2 rounded mt-1" value={d.name} onChange={e=>setD({...d, name:e.target.value})} /></div>
+                                <div><label className="text-xs font-bold text-gray-500 flex justify-between">الجوال<button onClick={() => openWhatsApp(d.phone)} className="text-green-600 text-[10px] flex items-center gap-1"><Icon name="MessageCircle" size={10}/> واتساب</button></label><input className="w-full bg-white border p-2 rounded mt-1 date-en" value={d.phone} onChange={e=>setD({...d, phone:e.target.value})} /></div>
+                                <div><label className="text-xs font-bold text-gray-500">المشروع</label><select className="w-full bg-white border p-2 rounded mt-1" value={d.projectType} onChange={e=>setD({...d, projectType:e.target.value})}>{PROJECT_TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
+                                <div><label className="text-xs font-bold text-gray-500">الخدمة</label><select className="w-full bg-white border p-2 rounded mt-1" value={d.serviceType} onChange={e=>setD({...d, serviceType:e.target.value})}>{SERVICE_TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
+                                <div><label className="text-xs font-bold text-gray-500">الحالة</label><select className="w-full bg-white border p-2 rounded mt-1" value={d.status} onChange={e=>setD({...d, status:e.target.value})}>{STATUS_LIST.map(s=><option key={s.key} value={s.key}>{s.label}</option>)}</select></div>
+                                <div><label className="text-xs font-bold text-gray-500">مسند إلى</label><select className="w-full bg-white border p-2 rounded mt-1" value={d.assignedTo} onChange={e=>setD({...d, assignedTo:e.target.value})}><option value="">بدون إسناد</option>{users.map(u=><option key={u.id} value={u.name}>{u.name}</option>)}</select></div>
+                                <div><label className="text-xs font-bold text-gray-500">المصدر</label><select className="w-full bg-white border p-2 rounded mt-1" value={d.source || ''} onChange={e=>setD({...d, source:e.target.value})}><option value="">اختر المصدر</option>{CLIENT_SOURCES.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
+                                <div><label className="text-xs font-bold text-gray-500 flex justify-between">رابط Drive {d.driveLink && <a href={d.driveLink} target="_blank" className="text-blue-600"><Icon name="ExternalLink" size={12}/></a>}</label><input className="w-full bg-white border p-2 rounded mt-1 text-left dir-ltr" value={d.driveLink} onChange={e=>setD({...d, driveLink:e.target.value})} /></div>
+                            </div>
+                            <div className="mt-6 pt-4 border-t space-y-2"><button onClick={saveAndClose} className="w-full bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700 flex items-center justify-center gap-2"><Icon name="Save" size={16} /> حفظ وإغلاق</button><button onClick={onClose} className="w-full bg-gray-200 text-gray-800 py-2 rounded font-bold hover:bg-gray-300">إغلاق</button></div>
+                        </div>
+                        <div className="flex-1 bg-white flex flex-col h-full">
+                            <div className="p-4 border-b flex justify-between items-center bg-gray-50">
+                                <div className="flex gap-6"><button onClick={()=>setTab('chat')} className={`pb-1 ${tab==='chat'?'font-bold border-b-2 border-black text-black':'text-gray-400'}`}>الملاحظات</button><button onClick={()=>setTab('tasks')} className={`pb-1 flex items-center gap-2 ${tab==='tasks'?'font-bold border-b-2 border-black text-black':'text-gray-400'}`}>المهام {pendingTasks > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{pendingTasks}</span>}</button></div>
+                                <button onClick={onClose} className="hidden md:block"><Icon name="X" /></button>
+                            </div>
+                            {tab === 'chat' ? (<><div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#f8f9fa]" ref={chatContainer}>{c.notes ? Object.values(c.notes).map((n, i) => (<div key={i} className={`flex flex-col ${n.author === (user.name || user.email) ? 'items-start' : 'items-end'}`}><div className={`max-w-[80%] p-3 rounded-xl text-sm ${n.author === (user.name || user.email) ? 'bg-white border rounded-tr-none' : 'bg-blue-50 rounded-tl-none'}`}><div className="flex justify-between gap-4 mb-1 text-[10px] text-gray-400 border-b pb-1"><span className="font-bold text-gray-600">{n.author}</span><span>{formatDate(n.timestamp)}</span></div><p className="whitespace-pre-wrap leading-relaxed">{linkify(n.text)}</p></div></div>)) : <div className="text-center text-gray-400 mt-20">لا توجد ملاحظات</div>}</div><form onSubmit={send} className="p-4 border-t flex gap-2"><textarea className="flex-1 bg-gray-100 border-0 p-3 rounded-lg outline-none" placeholder="اكتب ملاحظة..." value={note} onChange={e=>setNote(e.target.value)} rows="1"></textarea><button disabled={!note.trim()} className="bg-black text-white p-3 rounded-lg hover:bg-gray-800"><Icon name="Send" className="rtl:rotate-180" /></button></form></>) : (<><div className="flex-1 overflow-y-auto p-6 space-y-3">{c.tasks ? Object.entries(c.tasks).map(([tid, t]) => (<div key={tid} className="flex items-center gap-3 p-3 border rounded-xl hover:bg-gray-50 group transition"><button onClick={()=>onToggleTask(c.id, tid, t.completed)} className={`text-gray-400 hover:text-black ${t.completed ? 'text-green-500' : ''}`}><Icon name={t.completed ? "CheckSquare" : "Square"} /></button><span className={`flex-1 text-sm ${t.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}>{t.text}</span><button onClick={()=>onDeleteTask(c.id, tid)} className="text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"><Icon name="Trash2" size={16}/></button></div>)) : <div className="text-center text-gray-400 mt-20">لا توجد مهام</div>}</div><form onSubmit={submitTask} className="p-4 border-t flex gap-2"><input className="flex-1 bg-gray-100 border-0 p-3 rounded-lg outline-none" placeholder="أضف مهمة جديدة..." value={newTask} onChange={e=>setNewTask(e.target.value)} /><button disabled={!newTask.trim()} className="bg-black text-white p-3 rounded-lg hover:bg-gray-800"><Icon name="Plus" /></button></form></>)}
+                        </div>
+                    </div>
                 </div>
             );
         };
