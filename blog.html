@@ -251,32 +251,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAgxIJYhMQB_2n_CbQ47uhnU8lBE2ji5J8",
-            authDomain: "truedraftcrm.firebaseapp.com",
-            databaseURL: "https://truedraftcrm-default-rtdb.firebaseio.com",
-            projectId: "truedraftcrm",
-            storageBucket: "truedraftcrm.appspot.com",
-            messagingSenderId: "920547055600",
-            appId: "1:920547055600:web:c74f7de68ca8ae35852f35"
-        };
-
-        try {
-            const app = initializeApp(firebaseConfig);
-            const db = getDatabase(app);
-            window.db = db;
-            window.dbRef = ref;
-            window.dbOnValue = onValue;
-            document.dispatchEvent(new Event('firebaseReady'));
-        } catch (error) {
-            console.error("Firebase Init Error:", error);
-            document.getElementById('loader').innerText = 'خطأ في الاتصال.';
-        }
-    </script>
+    <script src="js/blog-data.js"></script>
     <script>
         let currentLang = localStorage.getItem('lang') || 'ar';
         const translations = {
@@ -352,54 +327,46 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('lang', currentLang);
             applyLanguage();
-            // We need to re-render posts if language changes, which will be handled by fetching again or storing both languages.
-            // For simplicity, we'll just let the fetch function re-run on language change.
-            fetchAndRenderPosts();
+            renderPosts();
         }
 
-        function fetchAndRenderPosts() {
-            const postsRef = window.dbRef(window.db, 'blogPosts');
-            window.dbOnValue(postsRef, (snapshot) => {
-                const posts = snapshot.val();
-                const grid = document.getElementById('blog-grid');
-                const loader = document.getElementById('loader');
-                if(loader) loader.remove();
+        function renderPosts() {
+            const grid = document.getElementById('blog-grid');
+            const loader = document.getElementById('loader');
+            if(loader) loader.remove();
 
-                if (!posts) {
-                    grid.innerHTML = '<p class="col-span-3 text-center">لا توجد مقالات حالياً.</p>';
-                    return;
-                }
+            if (!window.blogPosts || window.blogPosts.length === 0) {
+                grid.innerHTML = '<p class="col-span-3 text-center">لا توجد مقالات حالياً.</p>';
+                return;
+            }
+            
+            const postsArray = [...window.blogPosts].sort((a, b) => (a.order || 999) - (b.order || 999) || new Date(b.date) - new Date(a.date));
+
+            grid.innerHTML = postsArray.map(p => {
+                const title = currentLang === 'ar' ? p.title_ar : p.title_en;
+                const category = currentLang === 'ar' ? p.category_ar : p.category_en;
+                const date = new Date(p.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
                 
-                const postsArray = Object.keys(posts)
-                    .map(key => ({ id: key, ...posts[key] }))
-                    .sort((a, b) => (a.order || 999) - (b.order || 999) || new Date(b.date) - new Date(a.date));
-
-                grid.innerHTML = postsArray.map(p => {
-                    const title = currentLang === 'ar' ? p.title_ar : p.title_en;
-                    const category = currentLang === 'ar' ? p.category_ar : p.category_en;
-                    const date = new Date(p.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
-                    
-                    return `
-                        <a href="blog-post.html?slug=${p.slug}" class="group">
-                            <article>
-                                <div class="aspect-[4/3] bg-gray-200 overflow-hidden relative rounded-lg shadow-md mb-4">
-                                    <img src="${p.imageUrl}" alt="${title}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
-                                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold shadow-sm rounded-md font-english">${date}</div>
-                                </div>
-                                <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">${category}</span>
-                                <h3 class="text-2xl font-bold mt-2 mb-2 group-hover:text-[#C69C6D] transition-colors">${title}</h3>
-                                <span class="text-sm font-bold border-b-2 border-black pb-1 group-hover:border-[#C69C6D] transition-colors" data-i18n="read_more">اقرأ المزيد</span>
-                            </article>
-                        </a>
-                    `
-                }).join('');
-                applyLanguage(); // To translate "Read More"
-            }, { onlyOnce: true });
+                return `
+                    <a href="blog-post.html?slug=${p.slug}" class="group">
+                        <article>
+                            <div class="aspect-[4/3] bg-gray-200 overflow-hidden relative rounded-lg shadow-md mb-4">
+                                <img src="${p.imageUrl}" alt="${title}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" onerror="this.style.display='none'">
+                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 text-xs font-bold shadow-sm rounded-md font-english">${date}</div>
+                            </div>
+                            <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">${category}</span>
+                            <h3 class="text-2xl font-bold mt-2 mb-2 group-hover:text-[#C69C6D] transition-colors">${title}</h3>
+                            <span class="text-sm font-bold border-b-2 border-black pb-1 group-hover:border-[#C69C6D] transition-colors" data-i18n="read_more">اقرأ المزيد</span>
+                        </article>
+                    </a>
+                `
+            }).join('');
+            applyLanguage(); // To translate "Read More"
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             applyLanguage();
-            document.addEventListener('firebaseReady', fetchAndRenderPosts);
+            renderPosts();
         });
     </script>
 </body>
