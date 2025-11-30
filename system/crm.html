@@ -119,14 +119,35 @@
             Briefcase: "briefcase", FileText: "file-text", Clock: "clock", Megaphone: "megaphone",
             User: "user", Folder: "folder", Package: "package", Calendar: "calendar"
         };
-
+        
         const Icon = memo(({ name, size = 20, className = "" }) => {
-            useEffect(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            }, [name, size, className]);
-            return <i data-lucide={Icons[name]} width={size} height={size} className={className}></i>;
+            const iconData = useMemo(() => {
+                if (!window.lucide || !window.lucide.icons[Icons[name]]) return null;
+                return window.lucide.icons[Icons[name]][2];
+            }, [name]);
+        
+            const toKebabCase = (str) => str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+        
+            if (!iconData) return <i style={{width: size, height: size}} className={className}></i>;
+        
+            const svgContent = iconData.map(([tag, attrs], index) => {
+                const props = Object.entries(attrs).reduce((acc, [key, value]) => {
+                    acc[toKebabCase(key)] = value;
+                    return acc;
+                }, { key: `icon-child-${index}` });
+                return React.createElement(tag, props);
+            });
+        
+            return (
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={size} height={size} viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" strokeWidth="2"
+                    strokeLinecap="round" strokeLinejoin="round" className={className}
+                >
+                    {svgContent}
+                </svg>
+            );
         });
 
         const ADMIN_EMAIL = "al2we09@gmail.com";
@@ -178,8 +199,6 @@
                     });
             };
             
-            useEffect(() => { if (window.lucide) window.lucide.createIcons() });
-
             return (
                 <div className="min-h-screen flex items-center justify-center bg-[#101414]">
                     <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
@@ -543,32 +562,48 @@
                 });
             }, [user]);
 
-            useEffect(() => {
+             useEffect(() => {
                 const initAuth = () => {
+                    const loader = document.getElementById('initial-loader');
+                    
                     window.authListener(window.auth, (u) => {
                         if (u) {
                             window.dbOnValue(window.dbRef(window.db, 'users'), (snap) => {
                                 const val = snap.val();
                                 const userList = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
                                 setUsers(userList);
-
+            
                                 let currentUser = userList.find(x => x.email === u.email);
                                 if (u.email === ADMIN_EMAIL) {
                                     currentUser = { id: 'admin', name: 'Ali Saleh', email: u.email, role: 'admin' };
                                 }
-
-                                if (currentUser) {
-                                    setUser(currentUser);
-                                } else {
-                                    setUser({ name: u.email.split('@')[0], email: u.email, role: 'employee' }); // Fallback
+            
+                                if (!currentUser) {
+                                     setUser({ name: u.email.split('@')[0], email: u.email, role: 'employee', permissions: {} });
+                                     setLoading(false);
+                                     if(loader) loader.style.display = 'none';
+                                     return;
                                 }
+            
+                                const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
+                                if (currentUser.role === 'admin' && impersonatedUserEmail) {
+                                    const targetUser = userList.find(x => x.email === impersonatedUserEmail);
+                                    if (targetUser) {
+                                        setUser(targetUser);
+                                    } else {
+                                        setUser(currentUser);
+                                    }
+                                } else {
+                                    setUser(currentUser);
+                                }
+                                
                                 setLoading(false);
-                                document.getElementById('initial-loader').style.display = 'none';
+                                if(loader) loader.style.display = 'none';
                             });
                         } else {
                             setUser(null);
                             setLoading(false);
-                            document.getElementById('initial-loader').style.display = 'none';
+                            if(loader) loader.style.display = 'none';
                         }
                     });
                 };
@@ -579,10 +614,6 @@
             useEffect(() => {
                 fetchData();
             }, [fetchData]);
-
-            useEffect(() => {
-                if(window.lucide) window.lucide.createIcons();
-            });
 
             if (loading) return null;
             if (!user) return <Login />;
@@ -677,7 +708,7 @@
                                 <div className="flex gap-6"><button onClick={()=>setTab('chat')} className={`pb-1 ${tab==='chat'?'font-bold border-b-2 border-black text-black':'text-gray-400'}`}>الملاحظات</button><button onClick={()=>setTab('tasks')} className={`pb-1 flex items-center gap-2 ${tab==='tasks'?'font-bold border-b-2 border-black text-black':'text-gray-400'}`}>المهام {pendingTasks > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 rounded-full">{pendingTasks}</span>}</button></div>
                                 <button onClick={onClose} className="hidden md:block"><Icon name="X" /></button>
                             </div>
-                            {tab === 'chat' ? (<><div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#f8f9fa]" ref={chatContainer}>{c.notes ? Object.values(c.notes).map((n, i) => (<div key={i} className={`flex flex-col ${n.author === (user.name || user.email) ? 'items-start' : 'items-end'}`}><div className={`max-w-[80%] p-3 rounded-xl text-sm ${n.author === (user.name || user.email) ? 'bg-white border rounded-tr-none' : 'bg-blue-50 rounded-tl-none'}`}><div className="flex justify-between gap-4 mb-1 text-[10px] text-gray-400 border-b pb-1"><span className="font-bold text-gray-600">{n.author}</span><span>{formatDate(n.timestamp)}</span></div><p className="whitespace-pre-wrap leading-relaxed">{linkify(n.text)}</p></div></div>)) : <div className="text-center text-gray-400 mt-20">لا توجد ملاحظات</div>}</div><form onSubmit={send} className="p-4 border-t flex gap-2"><textarea className="flex-1 bg-gray-100 border-0 p-3 rounded-lg outline-none" placeholder="اكتب ملاحظة..." value={note} onChange={e=>setNote(e.target.value)} rows="1"></textarea><button disabled={!note.trim()} className="bg-black text-white p-3 rounded-lg hover:bg-gray-800"><Icon name="Send" className="rtl:rotate-180" /></button></form></>) : (<><div className="flex-1 overflow-y-auto p-6 space-y-3">{c.tasks ? Object.entries(c.tasks).map(([tid, t]) => (<div key={tid} className="flex items-center gap-3 p-3 border rounded-xl hover:bg-gray-50 group transition"><button onClick={()=>onToggleTask(c.id, tid, t.completed)} className={`text-gray-400 hover:text-black ${t.completed ? 'text-green-500' : ''}`}><Icon name={t.completed ? "CheckSquare" : "Square"} /></button><span className={`flex-1 text-sm ${t.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}>{t.text}</span><button onClick={()=>onDeleteTask(c.id, tid)} className="text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"><Icon name="Trash2" size={16}/></button></div>)) : <div className="text-center text-gray-400 mt-20">لا توجد مهام</div>}</div><form onSubmit={submitTask} className="p-4 border-t flex gap-2"><input className="flex-1 bg-gray-100 border-0 p-3 rounded-lg outline-none" placeholder="أضف مهمة جديدة..." value={newTask} onChange={e=>setNewTask(e.target.value)} /><button disabled={!newTask.trim()} className="bg-black text-white p-3 rounded-lg hover:bg-gray-800"><Icon name="Plus" /></button></form></>)}
+                            {tab === 'chat' ? (<><div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#f8f9fa]" ref={chatContainer}>{c.notes ? Object.values(c.notes).map((n, i) => (<div key={i} className={`flex flex-col ${n.author === (user.name || user.email) ? 'items-start' : 'items-end'}`}><div className={`max-w-[80%] p-3 rounded-xl text-sm ${n.author === (user.name || user.email) ? 'bg-white border rounded-tr-none' : 'bg-blue-50 rounded-tl-none'}`}><div className="flex justify-between gap-4 mb-1 text-[10px] text-gray-400 border-b pb-1"><span className="font-bold text-gray-600">{n.author}</span><span>{formatDate(n.timestamp)}</span></div><p className="whitespace-pre-wrap leading-relaxed">{linkify(n.text)}</p></div></div>)) : <div className="text-center text-gray-400 mt-20">لا توجد ملاحظات</div>}</div><form onSubmit={send} className="p-4 border-t flex gap-2"><textarea className="flex-1 bg-gray-100 border-0 p-3 rounded-lg outline-none" placeholder="اكتب ملاحظة..." value={note} onChange={e=>setNote(e.target.value)} rows="2"></textarea><button disabled={!note.trim()} className="bg-black text-white p-3 rounded-lg hover:bg-gray-800"><Icon name="Send" className="rtl:rotate-180" /></button></form></>) : (<><div className="flex-1 overflow-y-auto p-6 space-y-3">{c.tasks ? Object.entries(c.tasks).map(([tid, t]) => (<div key={tid} className="flex items-center gap-3 p-3 border rounded-xl hover:bg-gray-50 group transition"><button onClick={()=>onToggleTask(c.id, tid, t.completed)} className={`text-gray-400 hover:text-black ${t.completed ? 'text-green-500' : ''}`}><Icon name={t.completed ? "CheckSquare" : "Square"} /></button><span className={`flex-1 text-sm ${t.completed ? 'line-through text-gray-400' : 'text-gray-800'}`}>{t.text}</span><button onClick={()=>onDeleteTask(c.id, tid)} className="text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"><Icon name="Trash2" size={16}/></button></div>)) : <div className="text-center text-gray-400 mt-20">لا توجد مهام</div>}</div><form onSubmit={submitTask} className="p-4 border-t flex gap-2"><input className="flex-1 bg-gray-100 border-0 p-3 rounded-lg outline-none" placeholder="أضف مهمة جديدة..." value={newTask} onChange={e=>setNewTask(e.target.value)} /><button disabled={!newTask.trim()} className="bg-black text-white p-3 rounded-lg hover:bg-gray-800"><Icon name="Plus" /></button></form></>)}
                         </div>
                     </div>
                 </div>
