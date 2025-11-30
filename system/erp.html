@@ -91,11 +91,6 @@
         };
         
         const Icon = ({ name, size = 20, className = "" }) => {
-            useEffect(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            }, [name, size, className]);
             return <i data-lucide={Icons[name]} width={size} height={size} className={className}></i>;
         };
         
@@ -118,6 +113,8 @@
                         setErr('خطأ في البريد أو كلمة المرور');
                     });
             };
+            
+            useEffect(() => { if (window.lucide) window.lucide.createIcons() });
 
             return (
                 <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -324,7 +321,7 @@
                     <h2 className="text-2xl font-bold mb-6">الوصول السريع</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Card title="إدارة العملاء (CRM)" desc="نظام متكامل لإدارة العملاء، الصفقات، والملاحظات" icon="Grid" href="crm.html" />
-                        <Card title="إدارة المدونة" desc="إدارة وإنشاء مقالات للموقع العام" icon="FileText" href="../blog-post.html?action=new" />
+                        <Card title="إدارة المدونة" desc="إدارة وإنشاء مقالات للموقع العام" icon="FileText" href="blog-editor.html" />
                     </div>
                 </div>
             );
@@ -390,6 +387,13 @@
                 }
                 return () => window.removeEventListener('hashchange', handleHashChange);
             }, []);
+            
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [route, users, user]);
+
 
             useEffect(() => {
                 const initAuth = () => {
