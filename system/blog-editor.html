@@ -224,7 +224,9 @@
                         } else {
                             window.location.href = 'erp.html';
                         }
-                        setLoading(false); document.getElementById('initial-loader')?.style.display = 'none';
+                        setLoading(false);
+                        const loader = document.getElementById('initial-loader');
+                        if (loader) loader.style.display = 'none';
                     });
                 };
                 document.addEventListener('firebaseReady', initAuth, { once: true });
