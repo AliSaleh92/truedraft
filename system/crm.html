@@ -119,7 +119,6 @@
         };
 
         const Icon = ({ name, size = 20, className = "" }) => {
-            useEffect(() => { if(window.lucide) window.lucide.createIcons(); }, [name]);
             return <i data-lucide={Icons[name]} width={size} height={size} className={className}></i>;
         };
 
@@ -171,6 +170,8 @@
                         setErr('خطأ في البريد أو كلمة المرور');
                     });
             };
+            
+            useEffect(() => { if (window.lucide) window.lucide.createIcons() });
 
             return (
                 <div className="min-h-screen flex items-center justify-center bg-[#101414]">
@@ -664,6 +665,10 @@
                 return () => document.removeEventListener('firebaseReady', initAuth);
             }, []);
             
+            useEffect(() => {
+                if(window.lucide) window.lucide.createIcons();
+            });
+
             if (loading) return null;
             if (!user) return <Login />;
 
