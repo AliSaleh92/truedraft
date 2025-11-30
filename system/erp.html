@@ -74,7 +74,7 @@
             window.authSignOut = signOut;
             window.authListener = onAuthStateChanged;
             
-            window.firebaseReady = true;
+            document.dispatchEvent(new Event('firebaseReady'));
         } catch (error) {
             console.error("Firebase Init Error:", error);
             document.getElementById('initial-loader').innerHTML = '<p style="color:red">خطأ في الاتصال بقاعدة البيانات.</p>';
@@ -90,21 +90,14 @@
             Trash2: "trash-2", Edit: "edit", KeyRound: "key-round", FileText: "file-text",
         };
         
-        // React-friendly Icon component to prevent DOM manipulation conflicts
         const Icon = ({ name, size = 20, className = "" }) => {
-            const iconHTML = useMemo(() => {
-                if (window.lucide && Icons[name] && window.lucide.icons[Icons[name]]) {
-                    return window.lucide.icons[Icons[name]].toSvg({
-                        width: size,
-                        height: size,
-                        class: className
-                    });
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
                 }
-                return ''; 
             }, [name, size, className]);
-            return <span className="inline-flex items-center justify-center" dangerouslySetInnerHTML={{ __html: iconHTML }} />;
+            return <i data-lucide={Icons[name]} width={size} height={size} className={className}></i>;
         };
-
         
         const Login = () => {
             const [email, setEmail] = useState('');
@@ -173,7 +166,9 @@
                     <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold">إضافة موظف جديد</h3>
-                            <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100"><Icon name="X" /></button>
+                            <button onClick={onClose} className="text-gray-400 hover:text-gray-800 p-1.5 rounded-full transition-colors hover:bg-gray-100">
+                                <Icon name="X" size={24} />
+                            </button>
                         </div>
                         <div className="space-y-4">
                             <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs p-3 rounded-lg">
@@ -313,19 +308,24 @@
         
         const Dashboard = () => {
             const Card = ({ title, desc, icon, href }) => (
-                <a href={href} className="bg-white p-8 rounded-2xl shadow-sm border text-center hover:shadow-lg hover:border-black hover:-translate-y-1 transition-all duration-300 flex flex-col items-center group">
-                    <div className="p-4 rounded-full inline-block mb-5 bg-slate-100 group-hover:bg-black transition-colors duration-300">
+                <a href={href} className="bg-white p-6 rounded-2xl shadow-sm border flex items-center gap-6 hover:shadow-lg hover:border-black hover:-translate-y-1 transition-all duration-300 group">
+                    <div className="p-4 rounded-xl bg-slate-100 group-hover:bg-black transition-colors duration-300">
                         <Icon name={icon} className="text-gray-800 group-hover:text-white transition-colors duration-300" size={32} />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800">{title}</h3>
-                    <p className="text-gray-500 mt-2 text-sm flex-grow">{desc}</p>
+                    <div>
+                        <h3 className="text-xl font-bold text-gray-800">{title}</h3>
+                        <p className="text-gray-500 mt-1 text-sm">{desc}</p>
+                    </div>
                 </a>
             );
 
             return (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 animate-fade-in max-w-4xl mx-auto mt-8">
-                    <Card title="إدارة العملاء (CRM)" desc="نظام متكامل لإدارة العملاء، الصفقات، والملاحظات" icon="Grid" href="crm.html" />
-                    <Card title="إدارة المدونة" desc="إدارة وإنشاء مقالات للموقع العام" icon="FileText" href="../blog-post.html?action=new" />
+                <div className="max-w-4xl mx-auto animate-fade-in">
+                    <h2 className="text-2xl font-bold mb-6">الوصول السريع</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Card title="إدارة العملاء (CRM)" desc="نظام متكامل لإدارة العملاء، الصفقات، والملاحظات" icon="Grid" href="crm.html" />
+                        <Card title="إدارة المدونة" desc="إدارة وإنشاء مقالات للموقع العام" icon="FileText" href="../blog-post.html?action=new" />
+                    </div>
                 </div>
             );
         };
@@ -392,60 +392,62 @@
             }, []);
 
             useEffect(() => {
-                const interval = setInterval(() => {
-                    if (window.firebaseReady) {
-                        clearInterval(interval);
-                        const loader = document.getElementById('initial-loader');
-                        if (loader) {
-                           loader.style.display = 'none';
-                        }
+                const initAuth = () => {
+                    const loader = document.getElementById('initial-loader');
+                    if (loader) loader.style.display = 'none';
 
-                        window.authListener(window.auth, (u) => {
-                            if (u) {
-                                const usersRef = window.dbRef(window.db, 'users');
-                                window.dbOnValue(usersRef, (snap) => {
-                                    const val = snap.val();
-                                    const userList = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
-                                    setUsers(userList);
+                    window.authListener(window.auth, (u) => {
+                        if (u) {
+                            const usersRef = window.dbRef(window.db, 'users');
+                            window.dbOnValue(usersRef, (snap) => {
+                                const val = snap.val();
+                                const userList = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
+                                setUsers(userList);
 
-                                    let currentUser = userList.find(x => x.email === u.email);
-                                    if (u.email === ADMIN_EMAIL) {
-                                        currentUser = { id: 'admin', name: 'Ali Saleh', email: u.email, role: 'admin' };
-                                    }
+                                let currentUser = userList.find(x => x.email === u.email);
+                                if (u.email === ADMIN_EMAIL) {
+                                    currentUser = { id: 'admin', name: 'Ali Saleh', email: u.email, role: 'admin' };
+                                }
 
-                                    if (!currentUser) {
-                                        setUser({ name: u.email.split('@')[0], email: u.email, role: 'employee' });
-                                        setLoading(false);
-                                        return;
-                                    }
+                                if (!currentUser) {
+                                    setUser({ name: u.email.split('@')[0], email: u.email, role: 'employee' });
+                                    setLoading(false);
+                                    return;
+                                }
 
-                                    const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
-                                    const storedAdmin = sessionStorage.getItem('originalAdminUser');
+                                const impersonatedUserEmail = sessionStorage.getItem('impersonatedUserEmail');
+                                const storedAdmin = sessionStorage.getItem('originalAdminUser');
 
-                                    if(currentUser.role === 'admin' && impersonatedUserEmail && storedAdmin) {
-                                        const targetUser = userList.find(x => x.email === impersonatedUserEmail);
-                                        if (targetUser) {
-                                            setOriginalAdminUser(JSON.parse(storedAdmin));
-                                            setUser(targetUser);
-                                        } else {
-                                            setUser(currentUser);
-                                        }
+                                if(currentUser.role === 'admin' && impersonatedUserEmail && storedAdmin) {
+                                    const targetUser = userList.find(x => x.email === impersonatedUserEmail);
+                                    if (targetUser) {
+                                        setOriginalAdminUser(JSON.parse(storedAdmin));
+                                        setUser(targetUser);
                                     } else {
                                         setUser(currentUser);
                                     }
-                                    setLoading(false);
-                                });
-                            } else {
-                                setUser(null);
-                                setOriginalAdminUser(null);
-                                sessionStorage.clear();
+                                } else {
+                                    setUser(currentUser);
+                                }
                                 setLoading(false);
-                                if(window.location.hash) window.location.hash = '';
-                            }
-                        });
-                    }
-                }, 100);
-                return () => clearInterval(interval);
+                            });
+                        } else {
+                            setUser(null);
+                            setOriginalAdminUser(null);
+                            sessionStorage.clear();
+                            setLoading(false);
+                            if(window.location.hash) window.location.hash = '';
+                        }
+                    });
+                };
+                
+                if (window.db) {
+                    initAuth();
+                } else {
+                    document.addEventListener('firebaseReady', initAuth, { once: true });
+                }
+
+                return () => document.removeEventListener('firebaseReady', initAuth);
             }, []);
 
             const impersonateUser = (targetUser) => {
